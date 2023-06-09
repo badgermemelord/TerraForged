@@ -19,11 +19,11 @@ configurations {
 }
 
 repositories {
-    maven { url "https://io.terraforged.com/maven/" }
+    //maven { url "https://io.terraforged.com/maven/" }
 }
 
 dependencies {
-    library "com.terraforged:Engine:0.2.8"
+    //library "com.terraforged:Engine:0.2.8"
 }
 
 task libraries(type: Copy) {
