@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.noise;
 
@@ -105,7 +105,12 @@ public interface Module extends Noise, SpecName {
     }
 
     default Module clamp(Module min, Module max) {
-        return (Module)(min.minValue() == min.maxValue() && min.minValue() == this.minValue() && max.minValue() == max.maxValue() && max.maxValue() == this.maxValue() ? this : new Clamp(this, min, max));
+        return (Module)(min.minValue() == min.maxValue()
+                && min.minValue() == this.minValue()
+                && max.minValue() == max.maxValue()
+                && max.maxValue() == this.maxValue()
+                ? this
+                : new Clamp(this, min, max));
     }
 
     default Module clamp(double min, double max) {
@@ -145,7 +150,12 @@ public interface Module extends Noise, SpecName {
     }
 
     default Module map(Module min, Module max) {
-        return (Module)(min.minValue() == min.maxValue() && min.minValue() == this.minValue() && max.minValue() == max.maxValue() && max.maxValue() == this.maxValue() ? this : new Map(this, min, max));
+        return (Module)(min.minValue() == min.maxValue()
+                && min.minValue() == this.minValue()
+                && max.minValue() == max.maxValue()
+                && max.maxValue() == this.maxValue()
+                ? this
+                : new Map(this, min, max));
     }
 
     default Module map(double min, double max) {

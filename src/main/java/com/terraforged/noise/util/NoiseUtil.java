@@ -1,105 +1,411 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.noise.util;
 
-public class NoiseUtil
-{
+public class NoiseUtil {
     public static final int X_PRIME = 1619;
     public static final int Y_PRIME = 31337;
-    public static final float CUBIC_2D_BOUNDING = 0.44444445f;
-    public static final float PI2 = 6.2831855f;
-    public static final float SQRT2;
-    private static final int SIN_BITS;
-    private static final int SIN_MASK;
-    private static final int SIN_COUNT;
-    private static final float radFull;
-    private static final float radToIndex;
-    private static final float degFull;
-    private static final float degToIndex;
-    public static final Vec2i[] MOORE;
-    public static final Vec2f[] GRAD_2D;
-    public static final Vec2f[] GRAD_2D_24;
-    public static final Vec2f[] CELL_2D;
-    private static final float[] SIN;
-    
-    public static Vec2f cell(final int seed, final int x, final int y) {
-        return NoiseUtil.CELL_2D[hash2D(seed, x, y) & 0xFF];
+    public static final float CUBIC_2D_BOUNDING = 0.44444445F;
+    public static final float PI2 = (float) (Math.PI * 2);
+    public static final float SQRT2 = (float)Math.sqrt(2.0);
+    private static final int SIN_BITS = 12;
+    private static final int SIN_MASK = ~(-1 << SIN_BITS);
+    private static final int SIN_COUNT = SIN_MASK + 1;
+    private static final float radFull = (float) (Math.PI * 2);
+    private static final float radToIndex = (float)SIN_COUNT / radFull;
+    private static final float degFull = 360.0F;
+    private static final float degToIndex = (float)SIN_COUNT / degFull;
+    public static final Vec2i[] MOORE = new Vec2i[]{
+            new Vec2i(-1, -1),
+            new Vec2i(0, -1),
+            new Vec2i(1, -1),
+            new Vec2i(-1, 0),
+            new Vec2i(0, 0),
+            new Vec2i(1, 0),
+            new Vec2i(-1, 1),
+            new Vec2i(0, 1),
+            new Vec2i(1, 1)
+    };
+    public static final Vec2f[] GRAD_2D = new Vec2f[]{
+            new Vec2f(-1.0F, -1.0F),
+            new Vec2f(1.0F, -1.0F),
+            new Vec2f(-1.0F, 1.0F),
+            new Vec2f(1.0F, 1.0F),
+            new Vec2f(0.0F, -1.0F),
+            new Vec2f(-1.0F, 0.0F),
+            new Vec2f(0.0F, 1.0F),
+            new Vec2f(1.0F, 0.0F)
+    };
+    public static final Vec2f[] GRAD_2D_24 = new Vec2f[]{
+            new Vec2f(0.13052619F, 0.9914449F),
+            new Vec2f(0.38268343F, 0.9238795F),
+            new Vec2f(0.6087614F, 0.7933533F),
+            new Vec2f(0.6087614F, 0.7933533F),
+            new Vec2f(0.7933533F, 0.6087614F),
+            new Vec2f(0.9238795F, 0.38268343F),
+            new Vec2f(0.9914449F, 0.13052619F),
+            new Vec2f(0.9914449F, 0.13052619F),
+            new Vec2f(0.9914449F, -0.13052619F),
+            new Vec2f(0.9238795F, -0.38268343F),
+            new Vec2f(0.7933533F, -0.6087614F),
+            new Vec2f(0.7933533F, -0.6087614F),
+            new Vec2f(0.6087614F, -0.7933533F),
+            new Vec2f(0.38268343F, -0.9238795F),
+            new Vec2f(0.13052619F, -0.9914449F),
+            new Vec2f(0.13052619F, -0.9914449F),
+            new Vec2f(-0.13052619F, -0.9914449F),
+            new Vec2f(-0.38268343F, -0.9238795F),
+            new Vec2f(-0.6087614F, -0.7933533F),
+            new Vec2f(-0.6087614F, -0.7933533F),
+            new Vec2f(-0.7933533F, -0.6087614F),
+            new Vec2f(-0.9238795F, -0.38268343F),
+            new Vec2f(-0.9914449F, -0.13052619F),
+            new Vec2f(-0.9914449F, -0.13052619F),
+            new Vec2f(-0.9914449F, 0.13052619F),
+            new Vec2f(-0.9238795F, 0.38268343F),
+            new Vec2f(-0.7933533F, 0.6087614F),
+            new Vec2f(-0.7933533F, 0.6087614F),
+            new Vec2f(-0.6087614F, 0.7933533F),
+            new Vec2f(-0.38268343F, 0.9238795F),
+            new Vec2f(-0.13052619F, 0.9914449F),
+            new Vec2f(-0.13052619F, 0.9914449F)
+    };
+    public static final Vec2f[] CELL_2D = new Vec2f[]{
+            new Vec2f(0.06864607F, 0.62819433F),
+            new Vec2f(0.32666832F, 0.9152784F),
+            new Vec2f(0.21780425F, 0.14947817F),
+            new Vec2f(0.21935263F, 0.8517628F),
+            new Vec2f(0.8125509F, 0.17625329F),
+            new Vec2f(0.83830184F, 0.20326465F),
+            new Vec2f(0.0606018F, 0.40289584F),
+            new Vec2f(0.053955644F, 0.44046497F),
+            new Vec2f(0.19777697F, 0.8334085F),
+            new Vec2f(0.28731894F, 0.103431255F),
+            new Vec2f(0.20088434F, 0.83619905F),
+            new Vec2f(0.7293324F, 0.8871778F),
+            new Vec2f(0.9475439F, 0.4530485F),
+            new Vec2f(0.6777518F, 0.9134057F),
+            new Vec2f(0.66885227F, 0.0828802F),
+            new Vec2f(0.4023403F, 0.939275F),
+            new Vec2f(0.58450186F, 0.94199485F),
+            new Vec2f(0.09012395F, 0.31425387F),
+            new Vec2f(0.8476586F, 0.21428421F),
+            new Vec2f(0.164933F, 0.19961673F),
+            new Vec2f(0.729819F, 0.11311084F),
+            new Vec2f(0.48930076F, 0.9498728F),
+            new Vec2f(0.053985864F, 0.4402388F),
+            new Vec2f(0.8650294F, 0.7631607F),
+            new Vec2f(0.15052056F, 0.78348565F),
+            new Vec2f(0.087727934F, 0.68036556F),
+            new Vec2f(0.23267218F, 0.8619887F),
+            new Vec2f(0.822124F, 0.18577698F),
+            new Vec2f(0.7880446F, 0.15426844F),
+            new Vec2f(0.8892171F, 0.27414596F),
+            new Vec2f(0.9492085F, 0.47332188F),
+            new Vec2f(0.050227523F, 0.514308F),
+            new Vec2f(0.6278175F, 0.068534255F),
+            new Vec2f(0.464279F, 0.94858F),
+            new Vec2f(0.0702593F, 0.36649746F),
+            new Vec2f(0.17821822F, 0.8145735F),
+            new Vec2f(0.19428411F, 0.8302087F),
+            new Vec2f(0.08549601F, 0.6751755F),
+            new Vec2f(0.12618601F, 0.75052565F),
+            new Vec2f(0.72368914F, 0.10953468F),
+            new Vec2f(0.5029678F, 0.050009787F),
+            new Vec2f(0.67471284F, 0.0853008F),
+            new Vec2f(0.05762276F, 0.4175235F),
+            new Vec2f(0.2236039F, 0.14488706F),
+            new Vec2f(0.09806141F, 0.2976504F),
+            new Vec2f(0.8871414F, 0.27060616F),
+            new Vec2f(0.06999126F, 0.63263667F),
+            new Vec2f(0.46962425F, 0.051026374F),
+            new Vec2f(0.15138185F, 0.78454417F),
+            new Vec2f(0.54553515F, 0.05230975F),
+            new Vec2f(0.46241972F, 0.94842803F),
+            new Vec2f(0.8266409F, 0.809525F),
+            new Vec2f(0.5654002F, 0.0547778F),
+            new Vec2f(0.5340903F, 0.94870687F),
+            new Vec2f(0.055080622F, 0.56742966F),
+            new Vec2f(0.074406385F, 0.35381493F),
+            new Vec2f(0.9499173F, 0.5086273F),
+            new Vec2f(0.55242604F, 0.94693565F),
+            new Vec2f(0.050469488F, 0.47944975F),
+            new Vec2f(0.37952244F, 0.93357253F),
+            new Vec2f(0.15801361F, 0.2075187F),
+            new Vec2f(0.886532F, 0.73041916F),
+            new Vec2f(0.545061F, 0.0522618F),
+            new Vec2f(0.43716535F, 0.9455915F),
+            new Vec2f(0.89326F, 0.28126147F),
+            new Vec2f(0.94722617F, 0.4501127F),
+            new Vec2f(0.8753571F, 0.2517923F),
+            new Vec2f(0.2263377F, 0.857224F),
+            new Vec2f(0.67004615F, 0.9166345F),
+            new Vec2f(0.91026926F, 0.6848761F),
+            new Vec2f(0.82322717F, 0.18691185F),
+            new Vec2f(0.21176898F, 0.15442386F),
+            new Vec2f(0.70509726F, 0.9005435F),
+            new Vec2f(0.94140863F, 0.41248745F),
+            new Vec2f(0.33152997F, 0.9172743F),
+            new Vec2f(0.49602196F, 0.9499824F),
+            new Vec2f(0.29448664F, 0.9003302F),
+            new Vec2f(0.49390432F, 0.05004129F),
+            new Vec2f(0.38037717F, 0.06619084F),
+            new Vec2f(0.8901528F, 0.2757663F),
+            new Vec2f(0.51723534F, 0.94966984F),
+            new Vec2f(0.19849297F, 0.83405614F),
+            new Vec2f(0.48485738F, 0.05025485F),
+            new Vec2f(0.08574259F, 0.3242422F),
+            new Vec2f(0.30836228F, 0.09284526F),
+            new Vec2f(0.8749249F, 0.74886006F),
+            new Vec2f(0.2762226F, 0.8904147F),
+            new Vec2f(0.08336568F, 0.32995337F),
+            new Vec2f(0.86191714F, 0.7674247F),
+            new Vec2f(0.68911266F, 0.09166631F),
+            new Vec2f(0.1872575F, 0.8235616F),
+            new Vec2f(0.17181921F, 0.80789185F),
+            new Vec2f(0.27051932F, 0.88708997F),
+            new Vec2f(0.15547338F, 0.78948474F),
+            new Vec2f(0.08329046F, 0.33013785F),
+            new Vec2f(0.24210969F, 0.13122827F),
+            new Vec2f(0.13879621F, 0.76838744F),
+            new Vec2f(0.72679967F, 0.88866687F),
+            new Vec2f(0.7071571F, 0.89948213F),
+            new Vec2f(0.58355176F, 0.05782458F),
+            new Vec2f(0.06877667F, 0.62863296F),
+            new Vec2f(0.8257055F, 0.8105091F),
+            new Vec2f(0.6777011F, 0.08657247F),
+            new Vec2f(0.054817468F, 0.5656698F),
+            new Vec2f(0.89551437F, 0.7146355F),
+            new Vec2f(0.0735386F, 0.64363384F),
+            new Vec2f(0.12062004F, 0.25798586F),
+            new Vec2f(0.546176F, 0.052375406F),
+            new Vec2f(0.12859458F, 0.24591732F),
+            new Vec2f(0.7563571F, 0.13016075F),
+            new Vec2f(0.53476644F, 0.948655F),
+            new Vec2f(0.19345456F, 0.82943875F),
+            new Vec2f(0.274302F, 0.8893076F),
+            new Vec2f(0.9116448F, 0.31820747F),
+            new Vec2f(0.20922542F, 0.15656129F),
+            new Vec2f(0.78422785F, 0.15112391F),
+            new Vec2f(0.81145895F, 0.17520264F),
+            new Vec2f(0.94641554F, 0.44331557F),
+            new Vec2f(0.19626659F, 0.16796684F),
+            new Vec2f(0.9079607F, 0.6899159F),
+            new Vec2f(0.15130511F, 0.21554989F),
+            new Vec2f(0.8264822F, 0.80969244F),
+            new Vec2f(0.82111424F, 0.8152549F),
+            new Vec2f(0.51183385F, 0.94984436F),
+            new Vec2f(0.9333844F, 0.6211526F),
+            new Vec2f(0.8118669F, 0.8244057F),
+            new Vec2f(0.22724652F, 0.8579184F),
+            new Vec2f(0.077771366F, 0.34436262F),
+            new Vec2f(0.39903F, 0.061473995F),
+            new Vec2f(0.22588289F, 0.14312494F),
+            new Vec2f(0.3534875F, 0.92548096F),
+            new Vec2f(0.7302279F, 0.11335403F),
+            new Vec2f(0.13005644F, 0.7562065F),
+            new Vec2f(0.6057004F, 0.06259009F),
+            new Vec2f(0.23532864F, 0.86393553F),
+            new Vec2f(0.8521828F, 0.78012013F),
+            new Vec2f(0.31358123F, 0.090429455F),
+            new Vec2f(0.6994493F, 0.09661436F),
+            new Vec2f(0.8937065F, 0.7179339F),
+            new Vec2f(0.17738417F, 0.8137181F),
+            new Vec2f(0.87962353F, 0.74163187F),
+            new Vec2f(0.6482922F, 0.924864F),
+            new Vec2f(0.0925996F, 0.6911149F),
+            new Vec2f(0.9212853F, 0.65817297F),
+            new Vec2f(0.23787028F, 0.86577046F),
+            new Vec2f(0.2463013F, 0.12833217F),
+            new Vec2f(0.28997636F, 0.8979825F),
+            new Vec2f(0.86241525F, 0.76674926F),
+            new Vec2f(0.13549614F, 0.23611188F),
+            new Vec2f(0.73184866F, 0.88567626F),
+            new Vec2f(0.17395431F, 0.81015193F),
+            new Vec2f(0.28699547F, 0.10360491F),
+            new Vec2f(0.8814999F, 0.26134157F),
+            new Vec2f(0.15702268F, 0.79131866F),
+            new Vec2f(0.06441343F, 0.6129794F),
+            new Vec2f(0.28953204F, 0.8977477F),
+            new Vec2f(0.8348365F, 0.19935977F),
+            new Vec2f(0.8430469F, 0.79123676F),
+            new Vec2f(0.27081633F, 0.11273414F),
+            new Vec2f(0.75477076F, 0.1290662F),
+            new Vec2f(0.9236175F, 0.3481836F),
+            new Vec2f(0.34612256F, 0.9228732F),
+            new Vec2f(0.059255064F, 0.59079593F),
+            new Vec2f(0.43194723F, 0.055175513F),
+            new Vec2f(0.9453517F, 0.43548763F),
+            new Vec2f(0.75624645F, 0.13008413F),
+            new Vec2f(0.8278198F, 0.19172388F),
+            new Vec2f(0.08772257F, 0.31964666F),
+            new Vec2f(0.8354091F, 0.19999877F),
+            new Vec2f(0.94663286F, 0.44505385F),
+            new Vec2f(0.33910465F, 0.92025316F),
+            new Vec2f(0.40536046F, 0.9399356F),
+            new Vec2f(0.47362313F, 0.05077371F),
+            new Vec2f(0.9471028F, 0.4490188F),
+            new Vec2f(0.0634329F, 0.6091292F),
+            new Vec2f(0.10401413F, 0.7137643F),
+            new Vec2f(0.07599518F, 0.34926873F),
+            new Vec2f(0.11172053F, 0.72746223F),
+            new Vec2f(0.07163474F, 0.36214787F),
+            new Vec2f(0.8303888F, 0.80552125F),
+            new Vec2f(0.8321435F, 0.19638726F),
+            new Vec2f(0.08697894F, 0.32135618F),
+            new Vec2f(0.5840306F, 0.05791533F),
+            new Vec2f(0.11771172F, 0.7373935F),
+            new Vec2f(0.12876043F, 0.24567503F),
+            new Vec2f(0.9472364F, 0.45020437F),
+            new Vec2f(0.053340882F, 0.5547323F),
+            new Vec2f(0.54862726F, 0.052635074F),
+            new Vec2f(0.07968986F, 0.33925363F),
+            new Vec2f(0.7205361F, 0.8922548F),
+            new Vec2f(0.13750994F, 0.7666476F),
+            new Vec2f(0.09639132F, 0.30100244F),
+            new Vec2f(0.7152728F, 0.8951678F),
+            new Vec2f(0.06406072F, 0.38838938F),
+            new Vec2f(0.9178354F, 0.6670735F),
+            new Vec2f(0.700763F, 0.90273345F),
+            new Vec2f(0.42721933F, 0.055924594F),
+            new Vec2f(0.8644749F, 0.23607183F),
+            new Vec2f(0.06825483F, 0.6268704F),
+            new Vec2f(0.20256355F, 0.8376856F),
+            new Vec2f(0.20013279F, 0.8355289F),
+            new Vec2f(0.23263258F, 0.86195946F),
+            new Vec2f(0.7808423F, 0.85160714F),
+            new Vec2f(0.84989464F, 0.78297305F),
+            new Vec2f(0.27703142F, 0.89087725F),
+            new Vec2f(0.8305823F, 0.80531186F),
+            new Vec2f(0.25633186F, 0.12168023F),
+            new Vec2f(0.46597224F, 0.94871163F),
+            new Vec2f(0.18064117F, 0.81703305F),
+            new Vec2f(0.94546336F, 0.436263F),
+            new Vec2f(0.9483504F, 0.5384954F),
+            new Vec2f(0.05726415F, 0.41947067F),
+            new Vec2f(0.554523F, 0.9466847F),
+            new Vec2f(0.21874392F, 0.8512763F),
+            new Vec2f(0.6266697F, 0.9318041F),
+            new Vec2f(0.12640187F, 0.75084746F),
+            new Vec2f(0.7959708F, 0.1610291F),
+            new Vec2f(0.12856227F, 0.7540355F),
+            new Vec2f(0.095532894F, 0.30275303F),
+            new Vec2f(0.66361654F, 0.080798835F),
+            new Vec2f(0.8289186F, 0.19289646F),
+            new Vec2f(0.2505175F, 0.125489F),
+            new Vec2f(0.5328313F, 0.94880074F),
+            new Vec2f(0.33369392F, 0.081858516F),
+            new Vec2f(0.3931668F, 0.9371346F),
+            new Vec2f(0.5644026F, 0.054632396F),
+            new Vec2f(0.0516769F, 0.5388124F),
+            new Vec2f(0.07862225F, 0.3420735F),
+            new Vec2f(0.5509792F, 0.052896976F),
+            new Vec2f(0.7050584F, 0.09943658F),
+            new Vec2f(0.91780984F, 0.33286256F),
+            new Vec2f(0.14348105F, 0.22541988F),
+            new Vec2f(0.94783986F, 0.5440398F),
+            new Vec2f(0.16000003F, 0.20521191F),
+            new Vec2f(0.8767122F, 0.74614614F),
+            new Vec2f(0.18610656F, 0.82244515F),
+            new Vec2f(0.35379982F, 0.07441157F),
+            new Vec2f(0.89702904F, 0.28817946F),
+            new Vec2f(0.9459149F, 0.4395031F),
+            new Vec2f(0.08951107F, 0.3156123F),
+            new Vec2f(0.6475104F, 0.07486391F),
+            new Vec2f(0.5925803F, 0.94037354F),
+            new Vec2f(0.34103352F, 0.07901347F),
+            new Vec2f(0.7482445F, 0.8753327F),
+            new Vec2f(0.9383624F, 0.39832214F),
+            new Vec2f(0.56242806F, 0.94564867F),
+            new Vec2f(0.7846591F, 0.1514757F),
+            new Vec2f(0.15579724F, 0.21013024F),
+            new Vec2f(0.61981887F, 0.06624496F),
+            new Vec2f(0.2564093F, 0.8783696F),
+            new Vec2f(0.7958191F, 0.16089669F),
+            new Vec2f(0.3835992F, 0.93468475F),
+            new Vec2f(0.62740374F, 0.06841189F),
+            new Vec2f(0.8680473F, 0.7589231F),
+            new Vec2f(0.7451437F, 0.8773653F),
+            new Vec2f(0.06854904F, 0.62786734F)
+    };
+    private static final float[] SIN = new float[SIN_COUNT];
+
+    public NoiseUtil() {
     }
-    
-    public static float map(final float value, final float min, final float max, final float range) {
-        final float dif = clamp(value, min, max) - min;
-        if (dif > range) {
-            return 1.0f;
-        }
-        return dif / range;
+
+    public static Vec2f cell(int seed, int x, int y) {
+        return CELL_2D[hash2D(seed, x, y) & 0xFF];
     }
-    
-    public static float clamp(final float value, final float min, final float max) {
+
+    public static float map(float value, float min, float max, float range) {
+        float dif = clamp(value, min, max) - min;
+        return dif > range ? 1.0F : dif / range;
+    }
+
+    public static float clamp(float value, float min, float max) {
         if (value < min) {
             return min;
+        } else {
+            return value > max ? max : value;
         }
-        if (value > max) {
-            return max;
-        }
-        return value;
     }
-    
-    public static float dist2(final float x1, final float y1, final float x2, final float y2) {
-        final float dx = x1 - x2;
-        final float dy = y1 - y2;
+
+    public static float dist2(float x1, float y1, float x2, float y2) {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
         return dx * dx + dy * dy;
     }
-    
-    public static float dot(final float x0, final float y0, final float x1, final float y1) {
+
+    public static float dot(float x0, float y0, float x1, float y1) {
         return x0 * x1 + y0 * y1;
     }
-    
-    public static float div(final int num, final int denom) {
-        return num / (float)denom;
+
+    public static float div(int num, int denom) {
+        return (float)num / (float)denom;
     }
-    
-    public static int floor(final float f) {
-        return (f >= 0.0f) ? ((int)f) : ((int)f - 1);
+
+    public static int floor(float f) {
+        return f >= 0.0F ? (int)f : (int)f - 1;
     }
-    
-    public static int toInt(final float f) {
-        final int i = Float.floatToRawIntBits(f);
+
+    public static int toInt(float f) {
+        int i = Float.floatToRawIntBits(f);
         return i ^ i >> 16;
     }
-    
-    public static int round(final float f) {
-        return (f >= 0.0f) ? ((int)(f + 0.5f)) : ((int)(f - 0.5f));
+
+    public static int round(float f) {
+        return f >= 0.0F ? (int)(f + 0.5F) : (int)(f - 0.5F);
     }
-    
-    public static float lerp(final float a, final float b, final float alpha) {
+
+    public static float lerp(float a, float b, float alpha) {
         return a + alpha * (b - a);
     }
-    
-    public static float interpHermite(final float t) {
-        return t * t * (3.0f - 2.0f * t);
+
+    public static float interpHermite(float t) {
+        return t * t * (3.0F - 2.0F * t);
     }
-    
-    public static float interpQuintic(final float t) {
-        return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
+
+    public static float interpQuintic(float t) {
+        return t * t * t * (t * (t * 6.0F - 15.0F) + 10.0F);
     }
-    
-    public static float curve(final float t, final float steepness) {
-        return curve(t, 0.5f, steepness);
+
+    public static float curve(float t, float steepness) {
+        return curve(t, 0.5F, steepness);
     }
-    
-    public static float curve(final float t, final float mid, final float steepness) {
-        return 1.0f / (1.0f + exp(-steepness * (t - mid)));
+
+    public static float curve(float t, float mid, float steepness) {
+        return 1.0F / (1.0F + exp(-steepness * (t - mid)));
     }
-    
-    public static float cubicLerp(final float a, final float b, final float c, final float d, final float t) {
-        final float p = d - c - (a - b);
+
+    public static float cubicLerp(float a, float b, float c, float d, float t) {
+        float p = d - c - (a - b);
         return t * t * t * p + t * t * (a - b - p) + t * (c - a) + b;
     }
-    
+
     public static float exp(float x) {
-        x = 1.0f + x / 256.0f;
+        x = 1.0F + x / 256.0F;
         x *= x;
         x *= x;
         x *= x;
@@ -107,136 +413,113 @@ public class NoiseUtil
         x *= x;
         x *= x;
         x *= x;
-        x *= x;
-        return x;
+        return x * x;
     }
-    
-    public static float copySign(final float value, final float sign) {
-        if (sign < 0.0f && value > 0.0f) {
+
+    public static float copySign(float value, float sign) {
+        if (sign < 0.0F && value > 0.0F) {
             return -value;
+        } else {
+            return sign > 0.0F && value < 0.0F ? -value : value;
         }
-        if (sign > 0.0f && value < 0.0f) {
-            return -value;
-        }
-        return value;
     }
-    
-    public static float pow(final float value, final int power) {
+
+    public static float pow(float value, int power) {
         if (power == 0) {
-            return 1.0f;
-        }
-        if (power == 1) {
+            return 1.0F;
+        } else if (power == 1) {
             return value;
-        }
-        if (power == 2) {
+        } else if (power == 2) {
             return value * value;
-        }
-        if (power == 3) {
+        } else if (power == 3) {
             return value * value * value;
-        }
-        if (power == 4) {
+        } else if (power == 4) {
             return value * value * value * value;
+        } else {
+            float result = 1.0F;
+
+            for(int i = 0; i < power; ++i) {
+                result *= value;
+            }
+
+            return result;
         }
-        float result = 1.0f;
-        for (int i = 0; i < power; ++i) {
-            result *= value;
-        }
-        return result;
     }
-    
-    public static int hash(final int x, final int y) {
-        int hash = x;
+
+    public static int hash(int x, int y) {
+        int hash = x ^ 31337 * y;
+        hash = hash * hash * hash * 60493;
+        return hash >> 13 ^ hash;
+    }
+
+    public static int hash2D(int seed, int x, int y) {
+        int hash = seed ^ 1619 * x;
         hash ^= 31337 * y;
         hash = hash * hash * hash * 60493;
-        hash ^= hash >> 13;
-        return hash;
+        return hash >> 13 ^ hash;
     }
-    
-    public static int hash2D(final int seed, final int x, final int y) {
-        int hash = seed;
-        hash ^= 1619 * x;
-        hash ^= 31337 * y;
-        hash = hash * hash * hash * 60493;
-        hash ^= hash >> 13;
-        return hash;
-    }
-    
-    public static float valCoord2D(final int seed, final int x, final int y) {
-        int n = seed;
-        n ^= 1619 * x;
+
+    public static float valCoord2D(int seed, int x, int y) {
+        int n = seed ^ 1619 * x;
         n ^= 31337 * y;
-        return n * n * n * 60493 / 2.14748365E9f;
+        return (float)(n * n * n * 60493) / 2.14748365E9F;
     }
-    
-    public static Vec2f coord2D(final int seed, final int x, final int y) {
-        int hash = seed;
-        hash ^= 1619 * x;
+
+    public static Vec2f coord2D(int seed, int x, int y) {
+        int hash = seed ^ 1619 * x;
         hash ^= 31337 * y;
         hash = hash * hash * hash * 60493;
-        hash ^= hash >> 13;
-        return NoiseUtil.GRAD_2D[hash & 0x7];
+        hash = hash >> 13 ^ hash;
+        return GRAD_2D[hash & 7];
     }
-    
-    public static Vec2f coord2D_24(final int seed, final int x, final int y) {
-        int hash = seed;
-        hash ^= 1619 * x;
+
+    public static Vec2f coord2D_24(int seed, int x, int y) {
+        int hash = seed ^ 1619 * x;
         hash ^= 31337 * y;
         hash = hash * hash * hash * 60493;
-        hash ^= hash >> 13;
-        final int selector24 = (int)((hash & 0x3FFFFF) * 1.3333334f) & 0x1F;
-        return NoiseUtil.GRAD_2D_24[selector24];
+        hash = hash >> 13 ^ hash;
+        int selector24 = (int)((float)(hash & 4194303) * 1.3333334F) & 31;
+        return GRAD_2D_24[selector24];
     }
-    
-    public static float gradCoord2D(final int seed, final int x, final int y, final float xd, final float yd) {
-        final Vec2f g = coord2D(seed, x, y);
+
+    public static float gradCoord2D(int seed, int x, int y, float xd, float yd) {
+        Vec2f g = coord2D(seed, x, y);
         return xd * g.x + yd * g.y;
     }
-    
-    public static float gradCoord2D_24(final int seed, final int x, final int y, final float xd, final float yd) {
-        final Vec2f g = coord2D_24(seed, x, y);
+
+    public static float gradCoord2D_24(int seed, int x, int y, float xd, float yd) {
+        Vec2f g = coord2D_24(seed, x, y);
         return xd * g.x + yd * g.y;
     }
-    
-    public static float pow(final float value, final float power) {
-        return (float)Math.pow(value, power);
+
+    public static float pow(float value, float power) {
+        return (float)Math.pow((double)value, (double)power);
     }
-    
-    public static float sqrt(final float value) {
-        return (float)Math.sqrt(value);
+
+    public static float sqrt(float value) {
+        return (float)Math.sqrt((double)value);
     }
-    
-    public static float sin(final float r) {
-        final int index = (int)(r * NoiseUtil.radToIndex) & NoiseUtil.SIN_MASK;
-        return NoiseUtil.SIN[index];
+
+    public static float sin(float r) {
+        int index = (int)(r * radToIndex) & SIN_MASK;
+        return SIN[index];
     }
-    
-    public static float cos(final float r) {
-        return sin(r + 1.5708f);
+
+    public static float cos(float r) {
+        return sin(r + 1.5708F);
     }
-    
-    public static long seed(final int x, final int z) {
-        return ((long)x & 0xFFFFFFFFL) | ((long)z & 0xFFFFFFFFL) << 32;
+
+    public static long seed(int x, int z) {
+        return (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
     }
-    
+
     static {
-        SQRT2 = (float)Math.sqrt(2.0);
-        MOORE = new Vec2i[] { new Vec2i(-1, -1), new Vec2i(0, -1), new Vec2i(1, -1), new Vec2i(-1, 0), new Vec2i(0, 0), new Vec2i(1, 0), new Vec2i(-1, 1), new Vec2i(0, 1), new Vec2i(1, 1) };
-        GRAD_2D = new Vec2f[] { new Vec2f(-1.0f, -1.0f), new Vec2f(1.0f, -1.0f), new Vec2f(-1.0f, 1.0f), new Vec2f(1.0f, 1.0f), new Vec2f(0.0f, -1.0f), new Vec2f(-1.0f, 0.0f), new Vec2f(0.0f, 1.0f), new Vec2f(1.0f, 0.0f) };
-        GRAD_2D_24 = new Vec2f[] { new Vec2f(0.13052619f, 0.9914449f), new Vec2f(0.38268343f, 0.9238795f), new Vec2f(0.6087614f, 0.7933533f), new Vec2f(0.6087614f, 0.7933533f), new Vec2f(0.7933533f, 0.6087614f), new Vec2f(0.9238795f, 0.38268343f), new Vec2f(0.9914449f, 0.13052619f), new Vec2f(0.9914449f, 0.13052619f), new Vec2f(0.9914449f, -0.13052619f), new Vec2f(0.9238795f, -0.38268343f), new Vec2f(0.7933533f, -0.6087614f), new Vec2f(0.7933533f, -0.6087614f), new Vec2f(0.6087614f, -0.7933533f), new Vec2f(0.38268343f, -0.9238795f), new Vec2f(0.13052619f, -0.9914449f), new Vec2f(0.13052619f, -0.9914449f), new Vec2f(-0.13052619f, -0.9914449f), new Vec2f(-0.38268343f, -0.9238795f), new Vec2f(-0.6087614f, -0.7933533f), new Vec2f(-0.6087614f, -0.7933533f), new Vec2f(-0.7933533f, -0.6087614f), new Vec2f(-0.9238795f, -0.38268343f), new Vec2f(-0.9914449f, -0.13052619f), new Vec2f(-0.9914449f, -0.13052619f), new Vec2f(-0.9914449f, 0.13052619f), new Vec2f(-0.9238795f, 0.38268343f), new Vec2f(-0.7933533f, 0.6087614f), new Vec2f(-0.7933533f, 0.6087614f), new Vec2f(-0.6087614f, 0.7933533f), new Vec2f(-0.38268343f, 0.9238795f), new Vec2f(-0.13052619f, 0.9914449f), new Vec2f(-0.13052619f, 0.9914449f) };
-        CELL_2D = new Vec2f[] { new Vec2f(0.06864607f, 0.62819433f), new Vec2f(0.32666832f, 0.9152784f), new Vec2f(0.21780425f, 0.14947817f), new Vec2f(0.21935263f, 0.8517628f), new Vec2f(0.8125509f, 0.17625329f), new Vec2f(0.83830184f, 0.20326465f), new Vec2f(0.0606018f, 0.40289584f), new Vec2f(0.053955644f, 0.44046497f), new Vec2f(0.19777697f, 0.8334085f), new Vec2f(0.28731894f, 0.103431255f), new Vec2f(0.20088434f, 0.83619905f), new Vec2f(0.7293324f, 0.8871778f), new Vec2f(0.9475439f, 0.4530485f), new Vec2f(0.6777518f, 0.9134057f), new Vec2f(0.66885227f, 0.0828802f), new Vec2f(0.4023403f, 0.939275f), new Vec2f(0.58450186f, 0.94199485f), new Vec2f(0.09012395f, 0.31425387f), new Vec2f(0.8476586f, 0.21428421f), new Vec2f(0.164933f, 0.19961673f), new Vec2f(0.729819f, 0.11311084f), new Vec2f(0.48930076f, 0.9498728f), new Vec2f(0.053985864f, 0.4402388f), new Vec2f(0.8650294f, 0.7631607f), new Vec2f(0.15052056f, 0.78348565f), new Vec2f(0.087727934f, 0.68036556f), new Vec2f(0.23267218f, 0.8619887f), new Vec2f(0.822124f, 0.18577698f), new Vec2f(0.7880446f, 0.15426844f), new Vec2f(0.8892171f, 0.27414596f), new Vec2f(0.9492085f, 0.47332188f), new Vec2f(0.050227523f, 0.514308f), new Vec2f(0.6278175f, 0.068534255f), new Vec2f(0.464279f, 0.94858f), new Vec2f(0.0702593f, 0.36649746f), new Vec2f(0.17821822f, 0.8145735f), new Vec2f(0.19428411f, 0.8302087f), new Vec2f(0.08549601f, 0.6751755f), new Vec2f(0.12618601f, 0.75052565f), new Vec2f(0.72368914f, 0.10953468f), new Vec2f(0.5029678f, 0.050009787f), new Vec2f(0.67471284f, 0.0853008f), new Vec2f(0.05762276f, 0.4175235f), new Vec2f(0.2236039f, 0.14488706f), new Vec2f(0.09806141f, 0.2976504f), new Vec2f(0.8871414f, 0.27060616f), new Vec2f(0.06999126f, 0.63263667f), new Vec2f(0.46962425f, 0.051026374f), new Vec2f(0.15138185f, 0.78454417f), new Vec2f(0.54553515f, 0.05230975f), new Vec2f(0.46241972f, 0.94842803f), new Vec2f(0.8266409f, 0.809525f), new Vec2f(0.5654002f, 0.0547778f), new Vec2f(0.5340903f, 0.94870687f), new Vec2f(0.055080622f, 0.56742966f), new Vec2f(0.074406385f, 0.35381493f), new Vec2f(0.9499173f, 0.5086273f), new Vec2f(0.55242604f, 0.94693565f), new Vec2f(0.050469488f, 0.47944975f), new Vec2f(0.37952244f, 0.93357253f), new Vec2f(0.15801361f, 0.2075187f), new Vec2f(0.886532f, 0.73041916f), new Vec2f(0.545061f, 0.0522618f), new Vec2f(0.43716535f, 0.9455915f), new Vec2f(0.89326f, 0.28126147f), new Vec2f(0.94722617f, 0.4501127f), new Vec2f(0.8753571f, 0.2517923f), new Vec2f(0.2263377f, 0.857224f), new Vec2f(0.67004615f, 0.9166345f), new Vec2f(0.91026926f, 0.6848761f), new Vec2f(0.82322717f, 0.18691185f), new Vec2f(0.21176898f, 0.15442386f), new Vec2f(0.70509726f, 0.9005435f), new Vec2f(0.94140863f, 0.41248745f), new Vec2f(0.33152997f, 0.9172743f), new Vec2f(0.49602196f, 0.9499824f), new Vec2f(0.29448664f, 0.9003302f), new Vec2f(0.49390432f, 0.05004129f), new Vec2f(0.38037717f, 0.06619084f), new Vec2f(0.8901528f, 0.2757663f), new Vec2f(0.51723534f, 0.94966984f), new Vec2f(0.19849297f, 0.83405614f), new Vec2f(0.48485738f, 0.05025485f), new Vec2f(0.08574259f, 0.3242422f), new Vec2f(0.30836228f, 0.09284526f), new Vec2f(0.8749249f, 0.74886006f), new Vec2f(0.2762226f, 0.8904147f), new Vec2f(0.08336568f, 0.32995337f), new Vec2f(0.86191714f, 0.7674247f), new Vec2f(0.68911266f, 0.09166631f), new Vec2f(0.1872575f, 0.8235616f), new Vec2f(0.17181921f, 0.80789185f), new Vec2f(0.27051932f, 0.88708997f), new Vec2f(0.15547338f, 0.78948474f), new Vec2f(0.08329046f, 0.33013785f), new Vec2f(0.24210969f, 0.13122827f), new Vec2f(0.13879621f, 0.76838744f), new Vec2f(0.72679967f, 0.88866687f), new Vec2f(0.7071571f, 0.89948213f), new Vec2f(0.58355176f, 0.05782458f), new Vec2f(0.06877667f, 0.62863296f), new Vec2f(0.8257055f, 0.8105091f), new Vec2f(0.6777011f, 0.08657247f), new Vec2f(0.054817468f, 0.5656698f), new Vec2f(0.89551437f, 0.7146355f), new Vec2f(0.0735386f, 0.64363384f), new Vec2f(0.12062004f, 0.25798586f), new Vec2f(0.546176f, 0.052375406f), new Vec2f(0.12859458f, 0.24591732f), new Vec2f(0.7563571f, 0.13016075f), new Vec2f(0.53476644f, 0.948655f), new Vec2f(0.19345456f, 0.82943875f), new Vec2f(0.274302f, 0.8893076f), new Vec2f(0.9116448f, 0.31820747f), new Vec2f(0.20922542f, 0.15656129f), new Vec2f(0.78422785f, 0.15112391f), new Vec2f(0.81145895f, 0.17520264f), new Vec2f(0.94641554f, 0.44331557f), new Vec2f(0.19626659f, 0.16796684f), new Vec2f(0.9079607f, 0.6899159f), new Vec2f(0.15130511f, 0.21554989f), new Vec2f(0.8264822f, 0.80969244f), new Vec2f(0.82111424f, 0.8152549f), new Vec2f(0.51183385f, 0.94984436f), new Vec2f(0.9333844f, 0.6211526f), new Vec2f(0.8118669f, 0.8244057f), new Vec2f(0.22724652f, 0.8579184f), new Vec2f(0.077771366f, 0.34436262f), new Vec2f(0.39903f, 0.061473995f), new Vec2f(0.22588289f, 0.14312494f), new Vec2f(0.3534875f, 0.92548096f), new Vec2f(0.7302279f, 0.11335403f), new Vec2f(0.13005644f, 0.7562065f), new Vec2f(0.6057004f, 0.06259009f), new Vec2f(0.23532864f, 0.86393553f), new Vec2f(0.8521828f, 0.78012013f), new Vec2f(0.31358123f, 0.090429455f), new Vec2f(0.6994493f, 0.09661436f), new Vec2f(0.8937065f, 0.7179339f), new Vec2f(0.17738417f, 0.8137181f), new Vec2f(0.87962353f, 0.74163187f), new Vec2f(0.6482922f, 0.924864f), new Vec2f(0.0925996f, 0.6911149f), new Vec2f(0.9212853f, 0.65817297f), new Vec2f(0.23787028f, 0.86577046f), new Vec2f(0.2463013f, 0.12833217f), new Vec2f(0.28997636f, 0.8979825f), new Vec2f(0.86241525f, 0.76674926f), new Vec2f(0.13549614f, 0.23611188f), new Vec2f(0.73184866f, 0.88567626f), new Vec2f(0.17395431f, 0.81015193f), new Vec2f(0.28699547f, 0.10360491f), new Vec2f(0.8814999f, 0.26134157f), new Vec2f(0.15702268f, 0.79131866f), new Vec2f(0.06441343f, 0.6129794f), new Vec2f(0.28953204f, 0.8977477f), new Vec2f(0.8348365f, 0.19935977f), new Vec2f(0.8430469f, 0.79123676f), new Vec2f(0.27081633f, 0.11273414f), new Vec2f(0.75477076f, 0.1290662f), new Vec2f(0.9236175f, 0.3481836f), new Vec2f(0.34612256f, 0.9228732f), new Vec2f(0.059255064f, 0.59079593f), new Vec2f(0.43194723f, 0.055175513f), new Vec2f(0.9453517f, 0.43548763f), new Vec2f(0.75624645f, 0.13008413f), new Vec2f(0.8278198f, 0.19172388f), new Vec2f(0.08772257f, 0.31964666f), new Vec2f(0.8354091f, 0.19999877f), new Vec2f(0.94663286f, 0.44505385f), new Vec2f(0.33910465f, 0.92025316f), new Vec2f(0.40536046f, 0.9399356f), new Vec2f(0.47362313f, 0.05077371f), new Vec2f(0.9471028f, 0.4490188f), new Vec2f(0.0634329f, 0.6091292f), new Vec2f(0.10401413f, 0.7137643f), new Vec2f(0.07599518f, 0.34926873f), new Vec2f(0.11172053f, 0.72746223f), new Vec2f(0.07163474f, 0.36214787f), new Vec2f(0.8303888f, 0.80552125f), new Vec2f(0.8321435f, 0.19638726f), new Vec2f(0.08697894f, 0.32135618f), new Vec2f(0.5840306f, 0.05791533f), new Vec2f(0.11771172f, 0.7373935f), new Vec2f(0.12876043f, 0.24567503f), new Vec2f(0.9472364f, 0.45020437f), new Vec2f(0.053340882f, 0.5547323f), new Vec2f(0.54862726f, 0.052635074f), new Vec2f(0.07968986f, 0.33925363f), new Vec2f(0.7205361f, 0.8922548f), new Vec2f(0.13750994f, 0.7666476f), new Vec2f(0.09639132f, 0.30100244f), new Vec2f(0.7152728f, 0.8951678f), new Vec2f(0.06406072f, 0.38838938f), new Vec2f(0.9178354f, 0.6670735f), new Vec2f(0.700763f, 0.90273345f), new Vec2f(0.42721933f, 0.055924594f), new Vec2f(0.8644749f, 0.23607183f), new Vec2f(0.06825483f, 0.6268704f), new Vec2f(0.20256355f, 0.8376856f), new Vec2f(0.20013279f, 0.8355289f), new Vec2f(0.23263258f, 0.86195946f), new Vec2f(0.7808423f, 0.85160714f), new Vec2f(0.84989464f, 0.78297305f), new Vec2f(0.27703142f, 0.89087725f), new Vec2f(0.8305823f, 0.80531186f), new Vec2f(0.25633186f, 0.12168023f), new Vec2f(0.46597224f, 0.94871163f), new Vec2f(0.18064117f, 0.81703305f), new Vec2f(0.94546336f, 0.436263f), new Vec2f(0.9483504f, 0.5384954f), new Vec2f(0.05726415f, 0.41947067f), new Vec2f(0.554523f, 0.9466847f), new Vec2f(0.21874392f, 0.8512763f), new Vec2f(0.6266697f, 0.9318041f), new Vec2f(0.12640187f, 0.75084746f), new Vec2f(0.7959708f, 0.1610291f), new Vec2f(0.12856227f, 0.7540355f), new Vec2f(0.095532894f, 0.30275303f), new Vec2f(0.66361654f, 0.080798835f), new Vec2f(0.8289186f, 0.19289646f), new Vec2f(0.2505175f, 0.125489f), new Vec2f(0.5328313f, 0.94880074f), new Vec2f(0.33369392f, 0.081858516f), new Vec2f(0.3931668f, 0.9371346f), new Vec2f(0.5644026f, 0.054632396f), new Vec2f(0.0516769f, 0.5388124f), new Vec2f(0.07862225f, 0.3420735f), new Vec2f(0.5509792f, 0.052896976f), new Vec2f(0.7050584f, 0.09943658f), new Vec2f(0.91780984f, 0.33286256f), new Vec2f(0.14348105f, 0.22541988f), new Vec2f(0.94783986f, 0.5440398f), new Vec2f(0.16000003f, 0.20521191f), new Vec2f(0.8767122f, 0.74614614f), new Vec2f(0.18610656f, 0.82244515f), new Vec2f(0.35379982f, 0.07441157f), new Vec2f(0.89702904f, 0.28817946f), new Vec2f(0.9459149f, 0.4395031f), new Vec2f(0.08951107f, 0.3156123f), new Vec2f(0.6475104f, 0.07486391f), new Vec2f(0.5925803f, 0.94037354f), new Vec2f(0.34103352f, 0.07901347f), new Vec2f(0.7482445f, 0.8753327f), new Vec2f(0.9383624f, 0.39832214f), new Vec2f(0.56242806f, 0.94564867f), new Vec2f(0.7846591f, 0.1514757f), new Vec2f(0.15579724f, 0.21013024f), new Vec2f(0.61981887f, 0.06624496f), new Vec2f(0.2564093f, 0.8783696f), new Vec2f(0.7958191f, 0.16089669f), new Vec2f(0.3835992f, 0.93468475f), new Vec2f(0.62740374f, 0.06841189f), new Vec2f(0.8680473f, 0.7589231f), new Vec2f(0.7451437f, 0.8773653f), new Vec2f(0.06854904f, 0.62786734f) };
-        SIN_BITS = 12;
-        SIN_MASK = ~(-1 << NoiseUtil.SIN_BITS);
-        SIN_COUNT = NoiseUtil.SIN_MASK + 1;
-        radFull = 6.2831855f;
-        degFull = 360.0f;
-        radToIndex = NoiseUtil.SIN_COUNT / NoiseUtil.radFull;
-        degToIndex = NoiseUtil.SIN_COUNT / NoiseUtil.degFull;
-        SIN = new float[NoiseUtil.SIN_COUNT];
-        for (int i = 0; i < NoiseUtil.SIN_COUNT; ++i) {
-            NoiseUtil.SIN[i] = (float)Math.sin((i + 0.5f) / NoiseUtil.SIN_COUNT * NoiseUtil.radFull);
+        for(int i = 0; i < SIN_COUNT; ++i) {
+            SIN[i] = (float)Math.sin((double)(((float)i + 0.5F) / (float)SIN_COUNT * radFull));
         }
-        for (int i = 0; i < 360; i += 90) {
-            NoiseUtil.SIN[(int)(i * NoiseUtil.degToIndex) & NoiseUtil.SIN_MASK] = (float)Math.sin(i * 3.141592653589793 / 180.0);
+
+        for(int i = 0; i < 360; i += 90) {
+            SIN[(int)((float)i * degToIndex) & SIN_MASK] = (float)Math.sin((double)i * Math.PI / 180.0);
         }
     }
 }

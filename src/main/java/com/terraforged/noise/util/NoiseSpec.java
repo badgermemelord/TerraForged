@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.noise.util;
 
@@ -10,35 +10,83 @@ import com.terraforged.cereal.spec.DataSpec;
 import com.terraforged.cereal.spec.DataSpecs;
 import com.terraforged.cereal.value.DataObject;
 import com.terraforged.cereal.value.DataValue;
-import com.terraforged.noise.combiner.*;
-import com.terraforged.noise.domain.*;
+import com.terraforged.noise.combiner.Add;
+import com.terraforged.noise.combiner.Max;
+import com.terraforged.noise.combiner.Min;
+import com.terraforged.noise.combiner.Multiply;
+import com.terraforged.noise.combiner.Sub;
+import com.terraforged.noise.domain.AddWarp;
+import com.terraforged.noise.domain.CacheWarp;
+import com.terraforged.noise.domain.CompoundWarp;
+import com.terraforged.noise.domain.CumulativeWarp;
+import com.terraforged.noise.domain.DirectionWarp;
+import com.terraforged.noise.domain.DomainWarp;
 import com.terraforged.noise.func.CurveFunc;
 import com.terraforged.noise.func.Interpolation;
 import com.terraforged.noise.func.MidPointCurve;
 import com.terraforged.noise.func.SCurve;
-import com.terraforged.noise.modifier.*;
-import com.terraforged.noise.selector.*;
-import com.terraforged.noise.source.*;
-
+import com.terraforged.noise.modifier.Abs;
+import com.terraforged.noise.modifier.AdvancedTerrace;
+import com.terraforged.noise.modifier.Alpha;
+import com.terraforged.noise.modifier.Bias;
+import com.terraforged.noise.modifier.Boost;
+import com.terraforged.noise.modifier.Cache;
+import com.terraforged.noise.modifier.Clamp;
+import com.terraforged.noise.modifier.Curve;
+import com.terraforged.noise.modifier.Freq;
+import com.terraforged.noise.modifier.Grad;
+import com.terraforged.noise.modifier.Invert;
+import com.terraforged.noise.modifier.LegacyTerrace;
+import com.terraforged.noise.modifier.Map;
+import com.terraforged.noise.modifier.Modulate;
+import com.terraforged.noise.modifier.Power;
+import com.terraforged.noise.modifier.PowerCurve;
+import com.terraforged.noise.modifier.Scale;
+import com.terraforged.noise.modifier.Steps;
+import com.terraforged.noise.modifier.Terrace;
+import com.terraforged.noise.modifier.Threshold;
+import com.terraforged.noise.modifier.VariableCurve;
+import com.terraforged.noise.modifier.Warp;
+import com.terraforged.noise.selector.Base;
+import com.terraforged.noise.selector.Blend;
+import com.terraforged.noise.selector.MultiBlend;
+import com.terraforged.noise.selector.Select;
+import com.terraforged.noise.selector.VariableBlend;
+import com.terraforged.noise.source.BillowNoise;
+import com.terraforged.noise.source.CellEdgeNoise;
+import com.terraforged.noise.source.CellNoise;
+import com.terraforged.noise.source.Constant;
+import com.terraforged.noise.source.CubicNoise;
+import com.terraforged.noise.source.Line;
+import com.terraforged.noise.source.PerlinNoise;
+import com.terraforged.noise.source.PerlinNoise2;
+import com.terraforged.noise.source.Rand;
+import com.terraforged.noise.source.RidgeNoise;
+import com.terraforged.noise.source.SimplexNoise;
+import com.terraforged.noise.source.SimplexNoise2;
+import com.terraforged.noise.source.SimplexRidgeNoise;
+import com.terraforged.noise.source.Sin;
 import java.util.function.Function;
 
-public class NoiseSpec
-{
+public class NoiseSpec {
+    public NoiseSpec() {
+    }
+
     public static void init() {
     }
-    
-    public static int seed(final Context context) {
+
+    public static int seed(Context context) {
         return context.getData().get("seed").asInt();
     }
-    
-    public static int seed(final DataObject data, final DataSpec<?> spec, final Context context) {
+
+    public static int seed(DataObject data, DataSpec<?> spec, Context context) {
         return spec.get("seed", data, DataValue::asInt) + seed(context);
     }
-    
-    public static <T> DataAccessor<T, Integer> seed(final Function<T, Integer> getter) {
-        return (DataAccessor<T, Integer>)((t, context) -> getter.apply(t) - seed(context));
+
+    public static <T> DataAccessor<T, Integer> seed(Function<T, Integer> getter) {
+        return (t, context) -> getter.apply(t) - seed(context);
     }
-    
+
     static {
         DataSpecs.register(Constant.spec());
         DataSpecs.register(BillowNoise.billowSpec());

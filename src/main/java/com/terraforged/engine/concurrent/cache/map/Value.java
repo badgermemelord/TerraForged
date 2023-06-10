@@ -1,30 +1,27 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.concurrent.cache.map;
 
-public class Value
-{
+public class Value {
     public final int id;
-    
-    public Value(final int id) {
+
+    public Value(int id) {
         this.id = id;
     }
-    
-    @Override
-    public boolean equals(final Object o) {
+
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
+        } else if (o != null && this.getClass() == o.getClass()) {
+            Value value = (Value)o;
+            return this.id == value.id;
+        } else {
             return false;
         }
-        final Value value = (Value)o;
-        return this.id == value.id;
     }
-    
-    @Override
+
     public int hashCode() {
         return this.id;
     }

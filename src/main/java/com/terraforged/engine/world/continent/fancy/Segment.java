@@ -1,13 +1,12 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.continent.fancy;
 
 import com.terraforged.noise.util.Vec2f;
 
-public class Segment
-{
+public class Segment {
     public final Vec2f a;
     public final Vec2f b;
     public final float dx;
@@ -18,8 +17,8 @@ public class Segment
     public final float scale2A;
     public final float scaleB;
     public final float scale2B;
-    
-    public Segment(final Vec2f a, final Vec2f b, final float scaleA, final float scaleB) {
+
+    public Segment(Vec2f a, Vec2f b, float scaleA, float scaleB) {
         this.a = a;
         this.b = b;
         this.scaleA = scaleA;
@@ -28,31 +27,31 @@ public class Segment
         this.scale2B = scaleB * scaleB;
         this.dx = b.x - a.x;
         this.dy = b.y - a.y;
-        this.length = (float)Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+        this.length = (float)Math.sqrt((double)(this.dx * this.dx + this.dy * this.dy));
         this.length2 = this.dx * this.dx + this.dy * this.dy;
     }
-    
+
     public float minX() {
         return Math.min(this.a.x, this.b.x);
     }
-    
+
     public float minY() {
         return Math.min(this.a.y, this.b.y);
     }
-    
+
     public float maxX() {
         return Math.max(this.a.x, this.b.x);
     }
-    
+
     public float maxY() {
         return Math.max(this.a.y, this.b.y);
     }
-    
+
     public float maxScale() {
         return Math.max(this.scaleA, this.scaleB);
     }
-    
-    public Segment translate(final Vec2f offset) {
+
+    public Segment translate(Vec2f offset) {
         return new Segment(new Vec2f(this.a.x + offset.x, this.a.y + offset.y), new Vec2f(this.b.x + offset.x, this.b.y + offset.y), this.scaleA, this.scaleB);
     }
 }

@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.engine.world.heightmap;
@@ -10,7 +9,6 @@ import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.cell.Populator;
 import com.terraforged.engine.module.Blender;
 import com.terraforged.engine.settings.Settings;
-import com.terraforged.engine.settings.TerrainSettings;
 import com.terraforged.engine.settings.WorldSettings;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.climate.Climate;
@@ -56,7 +54,13 @@ public class Heightmap implements Populator {
         Seed regionWarp = context.seed.offset(8934);
         int regionWarpScale = 400;
         int regionWarpStrength = 200;
-        RegionConfig regionConfig = new RegionConfig(regionSeed.get(), context.settings.terrain.general.terrainRegionSize, Source.simplex(regionWarp.next(), regionWarpScale, 1), Source.simplex(regionWarp.next(), regionWarpScale, 1), (double)regionWarpStrength);
+        RegionConfig regionConfig = new RegionConfig(
+                regionSeed.get(),
+                context.settings.terrain.general.terrainRegionSize,
+                Source.simplex(regionWarp.next(), regionWarpScale, 1),
+                Source.simplex(regionWarp.next(), regionWarpScale, 1),
+                (double)regionWarpStrength
+        );
         this.levels = context.levels;
         this.terrainFrequency = 1.0F / settings.terrain.general.globalHorizontalScale;
         this.regionModule = new RegionModule(regionConfig);
@@ -65,13 +69,30 @@ public class Heightmap implements Populator {
         Module mountainShape = mountainShapeBase.curve(Interpolation.CURVE3).clamp(0.0, 0.9).map(0.0, 1.0);
         this.terrainProvider = context.terrainFactory.create(context, regionConfig, this);
         Populator terrainRegions = new RegionSelector(this.terrainProvider.getPopulators());
-        Populator terrainRegionBorders = TerrainPopulator.of(TerrainType.FLATS, this.terrainProvider.getLandforms().getLandBase(), this.terrainProvider.getLandforms().plains(context.seed), settings.terrain.steppe);
+        Populator terrainRegionBorders = TerrainPopulator.of(
+                TerrainType.FLATS,
+                this.terrainProvider.getLandforms().getLandBase(),
+                this.terrainProvider.getLandforms().plains(context.seed),
+                settings.terrain.steppe
+        );
         Populator terrain = new RegionLerper(terrainRegionBorders, terrainRegions);
-        Populator mountains = this.register(TerrainType.MOUNTAIN_CHAIN, this.terrainProvider.getLandforms().getLandBase(), this.terrainProvider.getLandforms().mountains(mountainSeed), settings.terrain.mountains);
+        Populator mountains = this.register(
+                TerrainType.MOUNTAIN_CHAIN,
+                this.terrainProvider.getLandforms().getLandBase(),
+                this.terrainProvider.getLandforms().mountains(mountainSeed),
+                settings.terrain.mountains
+        );
         this.continentGenerator = world.continent.continentType.create(context.seed, context);
         this.climate = new Climate(this.continentGenerator, context);
         Populator land = new Blender(mountainShape, terrain, mountains, 0.3F, 0.8F, 0.575F);
-        ContinentLerper3 oceans = new ContinentLerper3(this.register(TerrainType.DEEP_OCEAN, this.terrainProvider.getLandforms().deepOcean(context.seed.next())), this.register(TerrainType.SHALLOW_OCEAN, Source.constant((double)context.levels.water(-7))), this.register(TerrainType.COAST, Source.constant((double)context.levels.water)), controlPoints.deepOcean, controlPoints.shallowOcean, controlPoints.coast);
+        ContinentLerper3 oceans = new ContinentLerper3(
+                this.register(TerrainType.DEEP_OCEAN, this.terrainProvider.getLandforms().deepOcean(context.seed.next())),
+                this.register(TerrainType.SHALLOW_OCEAN, Source.constant((double)context.levels.water(-7))),
+                this.register(TerrainType.COAST, Source.constant((double)context.levels.water)),
+                controlPoints.deepOcean,
+                controlPoints.shallowOcean,
+                controlPoints.coast
+        );
         this.root = new ContinentLerper2(oceans, land, controlPoints.shallowOcean, controlPoints.inland);
     }
 
@@ -137,7 +158,7 @@ public class Heightmap implements Populator {
         return populator;
     }
 
-    private TerrainPopulator register(Terrain terrain, Module base, Module variance, TerrainSettings.Terrain settings) {
+    private TerrainPopulator register(Terrain terrain, Module base, Module variance, com.terraforged.engine.settings.TerrainSettings.Terrain settings) {
         TerrainPopulator populator = TerrainPopulator.of(terrain, base, variance, settings);
         this.terrainProvider.registerMixable(populator);
         return populator;

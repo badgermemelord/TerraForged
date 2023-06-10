@@ -1,30 +1,29 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.serialization.serializer;
 
-public interface Writer
-{
-    Writer name(final String p0);
-    
+public interface Writer {
+    Writer name(String var1);
+
     Writer beginObject();
-    
+
     Writer endObject();
-    
+
     Writer beginArray();
-    
+
     Writer endArray();
-    
-    Writer value(final String p0);
-    
-    Writer value(final float p0);
-    
-    Writer value(final int p0);
-    
-    Writer value(final boolean p0);
-    
-    default void readFrom(final Object value) throws IllegalAccessException {
+
+    Writer value(String var1);
+
+    Writer value(float var1);
+
+    Writer value(int var1);
+
+    Writer value(boolean var1);
+
+    default void readFrom(Object value) throws IllegalAccessException {
         new Serializer();
         Serializer.serialize(value, this);
     }

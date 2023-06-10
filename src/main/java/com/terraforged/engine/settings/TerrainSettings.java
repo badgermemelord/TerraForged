@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.settings;
 
@@ -9,98 +9,94 @@ import com.terraforged.engine.serialization.annotation.Rand;
 import com.terraforged.engine.serialization.annotation.Range;
 import com.terraforged.engine.serialization.annotation.Serializable;
 import com.terraforged.engine.world.terrain.populator.TerrainPopulator;
+import com.terraforged.noise.Module;
 
 @Serializable
-public class TerrainSettings
-{
-    public General general;
-    public Terrain steppe;
-    public Terrain plains;
-    public Terrain hills;
-    public Terrain dales;
-    public Terrain plateau;
-    public Terrain badlands;
-    public Terrain torridonian;
-    public Terrain mountains;
-    public Terrain volcano;
-    
+public class TerrainSettings {
+    public TerrainSettings.General general = new TerrainSettings.General();
+    public TerrainSettings.Terrain steppe = new TerrainSettings.Terrain(1.0F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain plains = new TerrainSettings.Terrain(2.0F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain hills = new TerrainSettings.Terrain(2.0F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain dales = new TerrainSettings.Terrain(1.5F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain plateau = new TerrainSettings.Terrain(1.5F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain badlands = new TerrainSettings.Terrain(1.0F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain torridonian = new TerrainSettings.Terrain(2.0F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain mountains = new TerrainSettings.Terrain(2.5F, 1.0F, 1.0F);
+    public TerrainSettings.Terrain volcano = new TerrainSettings.Terrain(5.0F, 1.0F, 1.0F);
+
     public TerrainSettings() {
-        this.general = new General();
-        this.steppe = new Terrain(1.0f, 1.0f, 1.0f);
-        this.plains = new Terrain(2.0f, 1.0f, 1.0f);
-        this.hills = new Terrain(2.0f, 1.0f, 1.0f);
-        this.dales = new Terrain(1.5f, 1.0f, 1.0f);
-        this.plateau = new Terrain(1.5f, 1.0f, 1.0f);
-        this.badlands = new Terrain(1.0f, 1.0f, 1.0f);
-        this.torridonian = new Terrain(2.0f, 1.0f, 1.0f);
-        this.mountains = new Terrain(2.5f, 1.0f, 1.0f);
-        this.volcano = new Terrain(5.0f, 1.0f, 1.0f);
     }
-    
+
     @Serializable
-    public static class General
-    {
+    public static class General {
         @Rand
-        @Comment({ "A seed offset used to randomise terrain distribution" })
-        public int terrainSeedOffset;
-        @Range(min = 125.0f, max = 5000.0f)
-        @Comment({ "Controls the size of terrain regions" })
-        public int terrainRegionSize;
-        @Range(min = 0.01f, max = 1.0f)
-        @Comment({ "Globally controls the vertical scaling of terrain" })
-        public float globalVerticalScale;
-        @Range(min = 0.01f, max = 5.0f)
-        @Comment({ "Globally controls the horizontal scaling of terrain" })
-        public float globalHorizontalScale;
-        @Comment({ "Carries out extra processing on mountains to make them look even nicer.", "Can be disabled to improve performance slightly." })
-        public boolean fancyMountains;
-        
+        @Comment({"A seed offset used to randomise terrain distribution"})
+        public int terrainSeedOffset = 0;
+        @Range(
+                min = 125.0F,
+                max = 5000.0F
+        )
+        @Comment({"Controls the size of terrain regions"})
+        public int terrainRegionSize = 1200;
+        @Range(
+                min = 0.01F,
+                max = 1.0F
+        )
+        @Comment({"Globally controls the vertical scaling of terrain"})
+        public float globalVerticalScale = 0.98F;
+        @Range(
+                min = 0.01F,
+                max = 5.0F
+        )
+        @Comment({"Globally controls the horizontal scaling of terrain"})
+        public float globalHorizontalScale = 1.0F;
+        @Comment({"Carries out extra processing on mountains to make them look even nicer.", "Can be disabled to improve performance slightly."})
+        public boolean fancyMountains = true;
+
         public General() {
-            this.terrainSeedOffset = 0;
-            this.terrainRegionSize = 1200;
-            this.globalVerticalScale = 0.98f;
-            this.globalHorizontalScale = 1.0f;
-            this.fancyMountains = true;
         }
     }
-    
+
     @Serializable
-    public static class Terrain
-    {
-        @Range(min = 0.0f, max = 10.0f)
-        @Comment({ "Controls how common this terrain type is" })
-        public float weight;
-        @Range(min = 0.0f, max = 2.0f)
-        @Comment({ "Controls the base height of this terrain" })
-        public float baseScale;
-        @Range(min = 0.0f, max = 10.0f)
-        @Comment({ "Stretches or compresses the terrain vertically" })
-        public float verticalScale;
-        @Range(min = 0.0f, max = 10.0f)
-        @Comment({ "Stretches or compresses the terrain horizontally" })
-        public float horizontalScale;
-        
+    public static class Terrain {
+        @Range(
+                min = 0.0F,
+                max = 10.0F
+        )
+        @Comment({"Controls how common this terrain type is"})
+        public float weight = 1.0F;
+        @Range(
+                min = 0.0F,
+                max = 2.0F
+        )
+        @Comment({"Controls the base height of this terrain"})
+        public float baseScale = 1.0F;
+        @Range(
+                min = 0.0F,
+                max = 10.0F
+        )
+        @Comment({"Stretches or compresses the terrain vertically"})
+        public float verticalScale = 1.0F;
+        @Range(
+                min = 0.0F,
+                max = 10.0F
+        )
+        @Comment({"Stretches or compresses the terrain horizontally"})
+        public float horizontalScale = 1.0F;
+
         public Terrain() {
-            this.weight = 1.0f;
-            this.baseScale = 1.0f;
-            this.verticalScale = 1.0f;
-            this.horizontalScale = 1.0f;
         }
-        
-        public Terrain(final float weight, final float vertical, final float horizontal) {
-            this.weight = 1.0f;
-            this.baseScale = 1.0f;
-            this.verticalScale = 1.0f;
-            this.horizontalScale = 1.0f;
+
+        public Terrain(float weight, float vertical, float horizontal) {
             this.weight = weight;
             this.verticalScale = vertical;
             this.horizontalScale = horizontal;
         }
-        
-        public Module apply(final double bias, final double scale, final Module module) {
-            final double moduleBias = bias * this.baseScale;
-            final double moduleScale = scale * this.verticalScale;
-            final Module outputModule = module.scale(moduleScale).bias(moduleBias);
+
+        public Module apply(double bias, double scale, Module module) {
+            double moduleBias = bias * (double)this.baseScale;
+            double moduleScale = scale * (double)this.verticalScale;
+            Module outputModule = module.scale(moduleScale).bias(moduleBias);
             return TerrainPopulator.clamp(outputModule);
         }
     }

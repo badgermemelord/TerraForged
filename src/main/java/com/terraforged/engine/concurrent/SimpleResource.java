@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.engine.concurrent;
@@ -31,6 +30,5 @@ public class SimpleResource<T> implements Resource<T> {
             this.open = false;
             this.closer.accept(this.value);
         }
-
     }
 }

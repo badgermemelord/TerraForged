@@ -1,22 +1,33 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.serialization.serializer;
 
 import com.terraforged.engine.Engine;
-import com.terraforged.engine.serialization.annotation.*;
+import com.terraforged.engine.serialization.annotation.Comment;
+import com.terraforged.engine.serialization.annotation.Limit;
+import com.terraforged.engine.serialization.annotation.Name;
+import com.terraforged.engine.serialization.annotation.NoName;
+import com.terraforged.engine.serialization.annotation.Rand;
+import com.terraforged.engine.serialization.annotation.Range;
+import com.terraforged.engine.serialization.annotation.Restricted;
+import com.terraforged.engine.serialization.annotation.Serializable;
+import com.terraforged.engine.serialization.annotation.Sorted;
+import com.terraforged.engine.serialization.annotation.Unstable;
 import com.terraforged.engine.util.NameUtil;
-
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.stream.Collector;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class Serializer
-{
+public class Serializer {
     public static final char META_PREFIX = '#';
     public static final String HIDE = "#hide";
     public static final String KEY = "key";
@@ -34,247 +45,253 @@ public class Serializer
     public static final String RESTRICTED = "restricted";
     public static final String RESTRICTED_NAME = "name";
     public static final String RESTRICTED_OPTIONS = "options";
-    
-    public static void serialize(final Object object, final Writer writer) throws IllegalAccessException {
+
+    public Serializer() {
+    }
+
+    public static void serialize(Object object, Writer writer) throws IllegalAccessException {
         serialize(object, writer, true);
     }
-    
-    public static void serialize(final Object object, final Writer writer, final boolean meta) throws IllegalAccessException {
+
+    public static void serialize(Object object, Writer writer, boolean meta) throws IllegalAccessException {
         serialize(object, writer, "", meta);
     }
-    
-    public static void serialize(final Object object, final Writer writer, final String parentId, final boolean meta) throws IllegalAccessException {
+
+    public static void serialize(Object object, Writer writer, String parentId, boolean meta) throws IllegalAccessException {
         if (object instanceof Map) {
             serializeMap((Map<?, ?>)object, writer, parentId, meta, false);
-        }
-        else if (object.getClass().isArray()) {
+        } else if (object.getClass().isArray()) {
             writer.beginArray();
-            for (int length = Array.getLength(object), i = 0; i < length; ++i) {
-                final Object element = Array.get(object, i);
+            int length = Array.getLength(object);
+
+            for(int i = 0; i < length; ++i) {
+                Object element = Array.get(object, i);
                 serialize(element, writer);
             }
+
             writer.endArray();
-        }
-        else if (!object.getClass().isPrimitive()) {
+        } else if (!object.getClass().isPrimitive()) {
             int order = 0;
             writer.beginObject();
-            for (final Field field : object.getClass().getFields()) {
+
+            for(Field field : object.getClass().getFields()) {
                 if (isSerializable(field)) {
                     field.setAccessible(true);
                     write(object, field, order, writer, parentId, meta);
                     ++order;
-                }
-                else if (meta && isHideMarker(field)) {
-                    writer.name("#hide").value((boolean)field.get(object));
+                } else if (meta && isHideMarker(field)) {
+                    writer.name("#hide").value((String) field.get(object));
                 }
             }
+
             writer.endObject();
         }
     }
-    
-    private static void write(final Object object, final Field field, final int order, final Writer writer, final String parentId, final boolean meta) throws IllegalAccessException {
+
+    private static void write(Object object, Field field, int order, Writer writer, String parentId, boolean meta) throws IllegalAccessException {
         if (field.getType() == Integer.TYPE) {
-            writer.name(field.getName()).value((int)field.get(object));
+            writer.name(field.getName()).value((String) field.get(object));
             writeMeta(field, order, writer, parentId, meta);
-            return;
-        }
-        if (field.getType() == Float.TYPE) {
-            writer.name(field.getName()).value((float)field.get(object));
+        } else if (field.getType() == Float.TYPE) {
+            writer.name(field.getName()).value((String) field.get(object));
             writeMeta(field, order, writer, parentId, meta);
-            return;
-        }
-        if (field.getType() == String.class) {
+        } else if (field.getType() == String.class) {
             writer.name(field.getName()).value((String)field.get(object));
             writeMeta(field, order, writer, parentId, meta);
-            return;
-        }
-        if (field.getType() == Boolean.TYPE) {
-            writer.name(field.getName()).value((boolean)field.get(object));
+        } else if (field.getType() == Boolean.TYPE) {
+            writer.name(field.getName()).value((String) field.get(object));
             writeMeta(field, order, writer, parentId, meta);
-            return;
-        }
-        if (field.getType().isEnum()) {
+        } else if (field.getType().isEnum()) {
             writer.name(field.getName()).value(((Enum)field.get(object)).name());
             writeMeta(field, order, writer, parentId, meta);
-            return;
-        }
-        if (field.getType().isArray()) {
+        } else if (field.getType().isArray()) {
             if (field.getType().getComponentType().isAnnotationPresent(Serializable.class)) {
                 writer.name(field.getName());
                 serialize(field.get(object), writer, getKeyName(parentId, field), meta);
                 writeMeta(field, order, writer, parentId, meta);
             }
-            return;
-        }
-        if (Map.class.isAssignableFrom(field.getType())) {
-            final Class<?> valueType = getMapValueType(field);
+        } else if (Map.class.isAssignableFrom(field.getType())) {
+            Class<?> valueType = getMapValueType(field);
             if (valueType != null && valueType.isAnnotationPresent(Serializable.class)) {
                 writer.name(field.getName());
                 serializeMap((Map<?, ?>)field.get(object), writer, parentId, meta, field.isAnnotationPresent(Sorted.class));
                 writeMeta(field, order, writer, parentId, meta);
             }
-            return;
-        }
-        if (field.getType().isAnnotationPresent(Serializable.class)) {
-            writer.name(field.getName());
-            final String parent = getKeyName(parentId, field);
-            serialize(field.get(object), writer, parent, meta);
-            writeMeta(field, order, writer, parentId, meta);
+        } else {
+            if (field.getType().isAnnotationPresent(Serializable.class)) {
+                writer.name(field.getName());
+                String parent = getKeyName(parentId, field);
+                serialize(field.get(object), writer, parent, meta);
+                writeMeta(field, order, writer, parentId, meta);
+            }
         }
     }
-    
-    private static void serializeMap(final Map<?, ?> map, final Writer writer, final String parentId, final boolean meta, final boolean sorted) throws IllegalAccessException {
+
+    private static void serializeMap(Map<?, ?> map, Writer writer, String parentId, boolean meta, boolean sorted) throws IllegalAccessException {
         writer.beginObject();
-        Collection<? extends Map.Entry<?, ?>> entries = map.entrySet();
+        Collection<? extends Entry<?, ?>> entries = map.entrySet();
         if (sorted) {
-            entries = entries.stream().sorted(Comparator.comparing(e -> e.getKey().toString())).collect((Collector<? super Map.Entry<?, ?>, ?, Collection<? extends Map.Entry<?, ?>>>)Collectors.toList());
+            entries = (Collection)entries.stream().sorted(Comparator.comparing(ex -> ex.getKey().toString())).collect(Collectors.toList());
         }
+
         int order = 0;
-        for (final Map.Entry<?, ?> e2 : entries) {
-            final String name = e2.getKey().toString();
+
+        for(Entry<?, ?> e : entries) {
+            String name = e.getKey().toString();
             writer.name(name);
-            serialize(e2.getValue(), writer, parentId, meta);
+            serialize(e.getValue(), writer, parentId, meta);
             writeMapEntryMeta(name, order, writer, meta);
             ++order;
         }
+
         writer.endObject();
     }
-    
-    private static void writeMeta(final Field field, final int order, final Writer writer, final String parentId, final boolean meta) throws IllegalAccessException {
-        if (!meta) {
-            return;
-        }
-        writer.name('#' + field.getName()).beginObject();
-        writer.name("order").value(order);
-        writer.name("key").value(getKeyName(parentId, field));
-        writer.name("display").value(getDisplayName(field));
-        final Range range = field.getAnnotation(Range.class);
-        if (range != null) {
-            if (field.getType() == Integer.TYPE) {
-                writer.name("min").value((int)range.min());
-                writer.name("max").value((int)range.max());
-            }
-            else {
-                writer.name("min").value(range.min());
-                writer.name("max").value(range.max());
-            }
-        }
-        final Rand seed = field.getAnnotation(Rand.class);
-        if (seed != null) {
-            writer.name("random").value(1);
-        }
-        final Comment comment = field.getAnnotation(Comment.class);
-        if (comment != null) {
-            writer.name("comment");
-            writer.value(getComment(comment));
-        }
-        final NoName noName = field.getAnnotation(NoName.class);
-        if (noName != null) {
-            writer.name("noname");
-            writer.value(true);
-        }
-        final Limit limit = field.getAnnotation(Limit.class);
-        if (limit != null) {
-            writer.name("limit_lower");
-            writer.value(limit.lower());
-            writer.name("limit_upper");
-            writer.value(limit.upper());
-            writer.name("pad");
-            writer.value(limit.pad());
-        }
-        final Restricted restricted = field.getAnnotation(Restricted.class);
-        if (restricted != null) {
-            writer.name("restricted");
-            writer.beginObject();
-            writer.name("name");
-            writer.value(restricted.name());
-            writer.name("options");
-            writer.beginArray();
-            for (final String value : restricted.value()) {
-                writer.value(value);
-            }
-            writer.endArray();
-            writer.endObject();
-        }
-        if (field.getType() == Boolean.TYPE) {
-            writer.name("options");
-            writer.beginArray();
-            writer.value(true);
-            writer.value(false);
-            writer.endArray();
-        }
-        if (field.getType().isEnum()) {
-            writer.name("options");
-            writer.beginArray();
-            for (final Enum<?> o : (Enum[])field.getType().asSubclass(Enum.class).getEnumConstants()) {
-                if (isValidOption(o)) {
-                    writer.value(o.name());
+
+    private static void writeMeta(Field field, int order, Writer writer, String parentId, boolean meta) throws IllegalAccessException {
+        if (meta) {
+            writer.name('#' + field.getName()).beginObject();
+            writer.name("order").value(order);
+            writer.name("key").value(getKeyName(parentId, field));
+            writer.name("display").value(getDisplayName(field));
+            Range range = (Range)field.getAnnotation(Range.class);
+            if (range != null) {
+                if (field.getType() == Integer.TYPE) {
+                    writer.name("min").value((int)range.min());
+                    writer.name("max").value((int)range.max());
+                } else {
+                    writer.name("min").value(range.min());
+                    writer.name("max").value(range.max());
                 }
             }
-            writer.endArray();
+
+            Rand seed = (Rand)field.getAnnotation(Rand.class);
+            if (seed != null) {
+                writer.name("random").value(1);
+            }
+
+            Comment comment = (Comment)field.getAnnotation(Comment.class);
+            if (comment != null) {
+                writer.name("comment");
+                writer.value(getComment(comment));
+            }
+
+            NoName noName = (NoName)field.getAnnotation(NoName.class);
+            if (noName != null) {
+                writer.name("noname");
+                writer.value(true);
+            }
+
+            Limit limit = (Limit)field.getAnnotation(Limit.class);
+            if (limit != null) {
+                writer.name("limit_lower");
+                writer.value(limit.lower());
+                writer.name("limit_upper");
+                writer.value(limit.upper());
+                writer.name("pad");
+                writer.value(limit.pad());
+            }
+
+            Restricted restricted = (Restricted)field.getAnnotation(Restricted.class);
+            if (restricted != null) {
+                writer.name("restricted");
+                writer.beginObject();
+                writer.name("name");
+                writer.value(restricted.name());
+                writer.name("options");
+                writer.beginArray();
+
+                for(String value : restricted.value()) {
+                    writer.value(value);
+                }
+
+                writer.endArray();
+                writer.endObject();
+            }
+
+            if (field.getType() == Boolean.TYPE) {
+                writer.name("options");
+                writer.beginArray();
+                writer.value(true);
+                writer.value(false);
+                writer.endArray();
+            }
+
+            if (field.getType().isEnum()) {
+                writer.name("options");
+                writer.beginArray();
+
+                for(Enum<?> o : (Enum[])field.getType().asSubclass(Enum.class).getEnumConstants()) {
+                    if (isValidOption(o)) {
+                        writer.value(o.name());
+                    }
+                }
+
+                writer.endArray();
+            }
+
+            writer.endObject();
         }
-        writer.endObject();
     }
-    
-    private static void writeMapEntryMeta(final String name, final int order, final Writer writer, final boolean meta) {
-        if (!meta) {
-            return;
+
+    private static void writeMapEntryMeta(String name, int order, Writer writer, boolean meta) {
+        if (meta) {
+            writer.name('#' + name);
+            writer.beginObject();
+            writer.name("order").value(order);
+            writer.name("key").value(name);
+            writer.name("display").value(name);
+            writer.endObject();
         }
-        writer.name('#' + name);
-        writer.beginObject();
-        writer.name("order").value(order);
-        writer.name("key").value(name);
-        writer.name("display").value(name);
-        writer.endObject();
     }
-    
-    private static String getDisplayName(final Field field) {
-        final Name nameMeta = field.getAnnotation(Name.class);
-        final String name = (nameMeta == null) ? field.getName() : nameMeta.value();
+
+    private static String getDisplayName(Field field) {
+        Name nameMeta = (Name)field.getAnnotation(Name.class);
+        String name = nameMeta == null ? field.getName() : nameMeta.value();
         return NameUtil.toDisplayName(name);
     }
-    
-    private static String getKeyName(final String parent, final Field field) {
-        final Name nameMeta = field.getAnnotation(Name.class);
-        final String name = (nameMeta == null) ? field.getName() : nameMeta.value();
+
+    private static String getKeyName(String parent, Field field) {
+        Name nameMeta = (Name)field.getAnnotation(Name.class);
+        String name = nameMeta == null ? field.getName() : nameMeta.value();
         return NameUtil.toTranslationKey(parent, name);
     }
-    
-    private static String getComment(final Comment comment) {
-        return String.join("\n", (CharSequence[])comment.value());
+
+    private static String getComment(Comment comment) {
+        return String.join("\n", comment.value());
     }
-    
-    private static boolean isValidOption(final Enum<?> value) {
+
+    private static boolean isValidOption(Enum<?> value) {
         if (Engine.ENFORCE_STABLE_OPTIONS) {
             try {
-                final Class<?> type = value.getDeclaringClass();
-                final Field field = type.getDeclaredField(value.name());
+                Class<?> type = value.getDeclaringClass();
+                Field field = type.getDeclaredField(value.name());
                 return !field.isAnnotationPresent(Unstable.class);
-            }
-            catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            } catch (NoSuchFieldException var3) {
+                var3.printStackTrace();
                 return false;
             }
+        } else {
+            return true;
         }
-        return true;
     }
-    
-    protected static Class<?> getMapValueType(final Field field) {
-        final ParameterizedType genericType = (ParameterizedType)field.getGenericType();
-        final Type[] types = genericType.getActualTypeArguments();
-        if (types.length == 2) {
-            return (Class<?>)types[1];
-        }
-        return null;
+
+    protected static Class<?> getMapValueType(Field field) {
+        ParameterizedType genericType = (ParameterizedType)field.getGenericType();
+        Type[] types = genericType.getActualTypeArguments();
+        return types.length == 2 ? (Class)types[1] : null;
     }
-    
-    protected static boolean isSerializable(final Field field) {
-        final int modifiers = field.getModifiers();
+
+    protected static boolean isSerializable(Field field) {
+        int modifiers = field.getModifiers();
         return Modifier.isPublic(modifiers) && !Modifier.isFinal(modifiers) && !Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers);
     }
-    
-    protected static boolean isHideMarker(final Field field) {
-        final int modifiers = field.getModifiers();
-        return Modifier.isPublic(modifiers) && !Modifier.isFinal(modifiers) && !Modifier.isStatic(modifiers) && Modifier.isTransient(modifiers) && field.getType() == Boolean.TYPE;
+
+    protected static boolean isHideMarker(Field field) {
+        int modifiers = field.getModifiers();
+        return Modifier.isPublic(modifiers)
+                && !Modifier.isFinal(modifiers)
+                && !Modifier.isStatic(modifiers)
+                && Modifier.isTransient(modifiers)
+                && field.getType() == Boolean.TYPE;
     }
 }

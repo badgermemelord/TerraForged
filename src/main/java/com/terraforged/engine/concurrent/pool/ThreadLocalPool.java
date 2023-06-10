@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.engine.concurrent.pool;
@@ -15,10 +14,10 @@ public class ThreadLocalPool<T> {
     private final int size;
     private final Supplier<T> factory;
     private final Consumer<T> cleaner;
-    private final ThreadLocal<Pool<T>> local;
+    private final ThreadLocal<ThreadLocalPool.Pool<T>> local;
 
     public ThreadLocalPool(int size, Supplier<T> factory) {
-        this(size, factory, (t) -> {
+        this(size, factory, t -> {
         });
     }
 
@@ -30,33 +29,11 @@ public class ThreadLocalPool<T> {
     }
 
     public Resource<T> get() {
-        return ((Pool)this.local.get()).retain();
+        return ((ThreadLocalPool.Pool)this.local.get()).retain();
     }
 
-    private Pool<T> createPool() {
-        return new Pool(this.size, this.factory, this.cleaner);
-    }
-
-    private static class PoolResource<T> implements Resource<T> {
-        private final T value;
-        private final Pool<T> pool;
-
-        private PoolResource(T value, Pool<T> pool) {
-            this.value = value;
-            this.pool = pool;
-        }
-
-        public T get() {
-            return this.value;
-        }
-
-        public boolean isOpen() {
-            return true;
-        }
-
-        public void close() {
-            this.pool.restore(this);
-        }
+    private ThreadLocalPool.Pool<T> createPool() {
+        return new ThreadLocalPool.Pool<>(this.size, this.factory, this.cleaner);
     }
 
     private static class Pool<T> {
@@ -74,9 +51,8 @@ public class ThreadLocalPool<T> {
             this.pool = new ObjectArrayList(size);
 
             for(int i = 0; i < size; ++i) {
-                this.pool.add(new PoolResource(factory.get(), this));
+                this.pool.add(new ThreadLocalPool.PoolResource(factory.get(), this));
             }
-
         }
 
         private Resource<T> retain() {
@@ -85,7 +61,7 @@ public class ThreadLocalPool<T> {
                 --this.index;
                 return value;
             } else {
-                return new PoolResource(this.factory.get(), this);
+                return new ThreadLocalPool.PoolResource<>(this.factory.get(), this);
             }
         }
 
@@ -95,7 +71,28 @@ public class ThreadLocalPool<T> {
                 this.pool.add(resource);
                 ++this.index;
             }
+        }
+    }
 
+    private static class PoolResource<T> implements Resource<T> {
+        private final T value;
+        private final ThreadLocalPool.Pool<T> pool;
+
+        private PoolResource(T value, ThreadLocalPool.Pool<T> pool) {
+            this.value = value;
+            this.pool = pool;
+        }
+
+        public T get() {
+            return this.value;
+        }
+
+        public boolean isOpen() {
+            return true;
+        }
+
+        public void close() {
+            this.pool.restore(this);
         }
     }
 }

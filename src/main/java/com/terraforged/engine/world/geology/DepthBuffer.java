@@ -1,47 +1,45 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.geology;
 
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.concurrent.pool.ObjectPool;
 
-public class DepthBuffer
-{
-    private static final ObjectPool<DepthBuffer> pool;
+public class DepthBuffer {
+    private static final ObjectPool<DepthBuffer> pool = new ObjectPool(5, DepthBuffer::new);
     private float sum;
     private float[] buffer;
-    
-    public void init(final int size) {
-        this.sum = 0.0f;
+
+    public DepthBuffer() {
+    }
+
+    public void init(int size) {
+        this.sum = 0.0F;
         if (this.buffer == null || this.buffer.length < size) {
             this.buffer = new float[size];
         }
     }
-    
+
     public float getSum() {
         return this.sum;
     }
-    
-    public float get(final int index) {
+
+    public float get(int index) {
         return this.buffer[index];
     }
-    
-    public float getDepth(final int index) {
+
+    public float getDepth(int index) {
         return this.buffer[index] / this.sum;
     }
-    
-    public void set(final int index, final float value) {
+
+    public void set(int index, float value) {
         this.sum += value;
         this.buffer[index] = value;
     }
-    
+
     public static Resource<DepthBuffer> get() {
-        return DepthBuffer.pool.get();
-    }
-    
-    static {
-        pool = new ObjectPool<DepthBuffer>(5, DepthBuffer::new);
+        return pool.get();
     }
 }

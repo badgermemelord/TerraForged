@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.map;
 
@@ -10,67 +10,64 @@ import com.terraforged.engine.world.biome.map.set.BiomeTypeSet;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.heightmap.Levels;
 import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.util.function.BiConsumer;
 
-public interface BiomeMap<T>
-{
-    public static final int NULL_BIOME = Integer.MIN_VALUE;
-    
+public interface BiomeMap<T> {
+    int NULL_BIOME = Integer.MIN_VALUE;
+
     BiomeContext<T> getContext();
-    
-    int getBeach(final Cell p0);
-    
-    int getCoast(final Cell p0);
-    
-    int getRiver(final Cell p0);
-    
-    int getLake(final Cell p0);
-    
-    int getWetland(final Cell p0);
-    
-    int getShallowOcean(final Cell p0);
-    
-    int getDeepOcean(final Cell p0);
-    
-    int getLand(final Cell p0);
-    
-    int getMountain(final Cell p0);
-    
-    int getVolcano(final Cell p0);
-    
-    int provideBiome(final Cell p0, final Levels p1);
-    
+
+    int getBeach(Cell var1);
+
+    int getCoast(Cell var1);
+
+    int getRiver(Cell var1);
+
+    int getLake(Cell var1);
+
+    int getWetland(Cell var1);
+
+    int getShallowOcean(Cell var1);
+
+    int getDeepOcean(Cell var1);
+
+    int getLand(Cell var1);
+
+    int getMountain(Cell var1);
+
+    int getVolcano(Cell var1);
+
+    int provideBiome(Cell var1, Levels var2);
+
     BiomeTypeSet getLandSet();
-    
-    IntList getAllBiomes(final BiomeType p0);
-    
-    void forEach(final BiConsumer<String, BiomeSet> p0);
-    
-    default boolean isValid(final int id) {
+
+    IntList getAllBiomes(BiomeType var1);
+
+    void forEach(BiConsumer<String, BiomeSet> var1);
+
+    static boolean isValid(int id) {
         return id != Integer.MIN_VALUE;
     }
-    
-    public interface Builder<T>
-    {
-        Builder<T> addOcean(final T p0, final int p1);
-        
-        Builder<T> addBeach(final T p0, final int p1);
-        
-        Builder<T> addCoast(final T p0, final int p1);
-        
-        Builder<T> addRiver(final T p0, final int p1);
-        
-        Builder<T> addWetland(final T p0, final int p1);
-        
-        Builder<T> addLake(final T p0, final int p1);
-        
-        Builder<T> addMountain(final T p0, final int p1);
-        
-        Builder<T> addVolcano(final T p0, final int p1);
-        
-        Builder<T> addLand(final BiomeType p0, final T p1, final int p2);
-        
+
+    public interface Builder<T> {
+        BiomeMap.Builder<T> addOcean(T var1, int var2);
+
+        BiomeMap.Builder<T> addBeach(T var1, int var2);
+
+        BiomeMap.Builder<T> addCoast(T var1, int var2);
+
+        BiomeMap.Builder<T> addRiver(T var1, int var2);
+
+        BiomeMap.Builder<T> addWetland(T var1, int var2);
+
+        BiomeMap.Builder<T> addLake(T var1, int var2);
+
+        BiomeMap.Builder<T> addMountain(T var1, int var2);
+
+        BiomeMap.Builder<T> addVolcano(T var1, int var2);
+
+        BiomeMap.Builder<T> addLand(BiomeType var1, T var2, int var3);
+
         BiomeMap<T> build();
     }
 }

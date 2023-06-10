@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.modifier;
 
@@ -9,35 +9,30 @@ import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.terrain.TerrainCategory;
 
-public class DesertWetlandModifier implements BiomeModifier
-{
+public class DesertWetlandModifier implements BiomeModifier {
     private final BiomeMap<?> biomes;
-    
-    public DesertWetlandModifier(final BiomeMap<?> biomes) {
+
+    public DesertWetlandModifier(BiomeMap<?> biomes) {
         this.biomes = biomes;
     }
-    
-    @Override
+
     public int priority() {
         return 6;
     }
-    
-    @Override
+
     public boolean exitEarly() {
         return true;
     }
-    
-    @Override
-    public boolean test(final int biome, final Cell cell) {
+
+    public boolean test(int biome, Cell cell) {
         return cell.terrain.getDelegate() == TerrainCategory.WETLAND && cell.biome == BiomeType.DESERT;
     }
-    
-    @Override
-    public int modify(final int in, final Cell cell, final int x, final int z) {
+
+    public int modify(int in, Cell cell, int x, int z) {
         return this.biomes.getLandSet().getBiome(getBiomeType(cell), cell.temperature, cell.biomeRegionId);
     }
-    
-    private static BiomeType getBiomeType(final Cell cell) {
-        return (cell.biomeRegionId < 0.5f) ? BiomeType.SAVANNA : BiomeType.STEPPE;
+
+    private static BiomeType getBiomeType(Cell cell) {
+        return cell.biomeRegionId < 0.5F ? BiomeType.SAVANNA : BiomeType.STEPPE;
     }
 }

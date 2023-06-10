@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.noise;
@@ -31,12 +30,12 @@ public enum Source {
     SIN(Builder::sin),
     RAND(Builder::rand);
 
-    public static final Module ONE;
-    public static final Module ZERO;
-    public static final Module HALF;
+    public static final Module ONE = new Constant(1.0F);
+    public static final Module ZERO = new Constant(0.0F);
+    public static final Module HALF = new Constant(0.5F);
     private final Function<Builder, Module> fn;
 
-    private Source(Function fn) {
+    private Source(Function<Builder, Module> fn) {
         this.fn = fn;
     }
 
@@ -204,8 +203,5 @@ public enum Source {
 
     static {
         NoiseSpec.init();
-        ONE = new Constant(1.0F);
-        ZERO = new Constant(0.0F);
-        HALF = new Constant(0.5F);
     }
 }

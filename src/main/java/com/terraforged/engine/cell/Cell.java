@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.engine.cell;
@@ -15,14 +14,13 @@ import com.terraforged.engine.world.terrain.TerrainType;
 public class Cell {
     private static final Cell defaults = new Cell();
     private static final Cell EMPTY = new Cell() {
+        @Override
         public boolean isAbsent() {
             return true;
         }
     };
-    private static final ThreadLocalPool<Cell> POOL = new ThreadLocalPool(32, Cell::new, Cell::reset);
-    private static final ThreadLocal<SimpleResource<Cell>> LOCAL = ThreadLocal.withInitial(() -> {
-        return new SimpleResource(new Cell(), Cell::reset);
-    });
+    private static final ThreadLocalPool<Cell> POOL = new ThreadLocalPool<>(32, Cell::new, Cell::reset);
+    private static final ThreadLocal<SimpleResource<Cell>> LOCAL = ThreadLocal.withInitial(() -> new SimpleResource<>(new Cell(), Cell::reset));
     public float value;
     public float erosion;
     public float sediment;
@@ -41,12 +39,10 @@ public class Cell {
     public int continentX;
     public int continentZ;
     public boolean erosionMask = false;
-    public Terrain terrain;
-    public BiomeType biome;
+    public Terrain terrain = TerrainType.NONE;
+    public BiomeType biome = BiomeType.GRASSLAND;
 
     public Cell() {
-        this.terrain = TerrainType.NONE;
-        this.biome = BiomeType.GRASSLAND;
     }
 
     public void copyFrom(Cell other) {
@@ -86,14 +82,13 @@ public class Cell {
 
     public static Resource<Cell> getResource() {
         SimpleResource<Cell> resource = (SimpleResource)LOCAL.get();
-        return (Resource)(resource.isOpen() ? POOL.get() : resource);
+        return (Resource<Cell>)(resource.isOpen() ? POOL.get() : resource);
     }
-
     public interface ContextVisitor<C> {
         void visit(Cell var1, int var2, int var3, C var4);
     }
-
     public interface Visitor {
         void visit(Cell var1, int var2, int var3);
     }
+
 }

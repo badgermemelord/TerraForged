@@ -1,192 +1,202 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.concurrent.cache.map;
 
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
-public class LoadBalanceLongMap<T> implements LongMap<T>
-{
+public class LoadBalanceLongMap<T> implements LongMap<T> {
     private final int mask;
     private final int sectionCapacity;
     private final Long2ObjectLinkedOpenHashMap<T>[] maps;
     private final StampedLock[] locks;
-    
+
     public LoadBalanceLongMap(int factor, int size) {
         factor = getNearestFactor(factor);
         size = getSectionSize(size, factor);
         this.mask = factor - 1;
         this.sectionCapacity = size - 2;
-        this.maps = (Long2ObjectLinkedOpenHashMap<T>[])new Long2ObjectLinkedOpenHashMap[factor];
+        this.maps = new Long2ObjectLinkedOpenHashMap[factor];
         this.locks = new StampedLock[factor];
-        for (int i = 0; i < factor; ++i) {
-            this.maps[i] = (Long2ObjectLinkedOpenHashMap<T>)new Long2ObjectLinkedOpenHashMap(size);
+
+        for(int i = 0; i < factor; ++i) {
+            this.maps[i] = new Long2ObjectLinkedOpenHashMap(size);
             this.locks[i] = new StampedLock();
         }
     }
-    
-    @Override
+
     public int size() {
         int size = 0;
-        for (int i = 0; i < this.locks.length; ++i) {
-            final StampedLock lock = this.locks[i];
-            final long stamp = lock.readLock();
+
+        for(int i = 0; i < this.locks.length; ++i) {
+            StampedLock lock = this.locks[i];
+            long stamp = lock.readLock();
+
             try {
                 size += this.maps[i].size();
-            }
-            finally {
+            } finally {
                 lock.unlockRead(stamp);
             }
         }
+
         return size;
     }
-    
-    @Override
+
     public void clear() {
-        for (int i = 0; i < this.locks.length; ++i) {
-            final StampedLock lock = this.locks[i];
-            final long stamp = lock.writeLock();
+        for(int i = 0; i < this.locks.length; ++i) {
+            StampedLock lock = this.locks[i];
+            long stamp = lock.writeLock();
+
             try {
                 this.maps[i].clear();
-            }
-            finally {
+            } finally {
                 lock.unlockWrite(stamp);
             }
         }
     }
-    
-    @Override
-    public void remove(final long key) {
-        final int index = this.getIndex(key);
-        final StampedLock lock = this.locks[index];
-        final long stamp = lock.writeLock();
+
+    public void remove(long key) {
+        int index = this.getIndex(key);
+        StampedLock lock = this.locks[index];
+        long stamp = lock.writeLock();
+
         try {
             this.maps[index].remove(key);
-        }
-        finally {
+        } finally {
             lock.unlockWrite(stamp);
         }
     }
-    
-    @Override
-    public void remove(final long key, final Consumer<T> consumer) {
-        final int index = this.getIndex(key);
-        final StampedLock lock = this.locks[index];
-        final long stamp = lock.writeLock();
+
+    public void remove(long key, Consumer<T> consumer) {
+        int index = this.getIndex(key);
+        StampedLock lock = this.locks[index];
+        long stamp = lock.writeLock();
+
         try {
-            this.maps[index].remove(key, (Object)consumer);
-        }
-        finally {
+            this.maps[index].remove(key, consumer);
+        } finally {
             lock.unlockWrite(stamp);
         }
     }
-    
-    @Override
-    public int removeIf(final Predicate<T> predicate) {
+
+    public int removeIf(Predicate<T> predicate) {
         int count = 0;
-        for (int i = 0; i < this.locks.length; ++i) {
-            final StampedLock lock = this.locks[i];
-            final Long2ObjectLinkedOpenHashMap<T> map = this.maps[i];
-            final long stamp = lock.writeLock();
+
+        for(int i = 0; i < this.locks.length; ++i) {
+            StampedLock lock = this.locks[i];
+            Long2ObjectLinkedOpenHashMap<T> map = this.maps[i];
+            long stamp = lock.writeLock();
+
             try {
-                final int startSize = map.size();
-                final ObjectIterator<Long2ObjectMap.Entry<T>> iterator = (ObjectIterator<Long2ObjectMap.Entry<T>>)map.long2ObjectEntrySet().fastIterator();
-                while (iterator.hasNext()) {
-                    final Long2ObjectMap.Entry<T> entry = (Long2ObjectMap.Entry<T>)iterator.next();
-                    if (predicate.test((T)entry.getValue())) {
+                int startSize = map.size();
+                ObjectIterator<Entry<T>> iterator = map.long2ObjectEntrySet().fastIterator();
+
+                while(iterator.hasNext()) {
+                    Entry<T> entry = (Entry)iterator.next();
+                    if (predicate.test(entry.getValue())) {
                         iterator.remove();
                     }
                 }
+
                 count += startSize - map.size();
-            }
-            finally {
+            } finally {
                 lock.unlockWrite(stamp);
             }
         }
+
         return count;
     }
-    
-    @Override
-    public void put(final long key, final T value) {
-        final int index = this.getIndex(key);
-        final StampedLock lock = this.locks[index];
-        final Long2ObjectLinkedOpenHashMap<T> map = this.maps[index];
-        final long stamp = lock.writeLock();
+
+    public void put(long key, T value) {
+        int index = this.getIndex(key);
+        StampedLock lock = this.locks[index];
+        Long2ObjectLinkedOpenHashMap<T> map = this.maps[index];
+        long stamp = lock.writeLock();
+
         try {
             if (map.size() > this.sectionCapacity) {
                 map.removeFirst();
             }
-            map.put(key, (Object)value);
-        }
-        finally {
+
+            map.put(key, value);
+        } finally {
             lock.unlockWrite(stamp);
         }
     }
-    
-    @Override
-    public T get(final long key) {
-        final int index = this.getIndex(key);
-        final StampedLock lock = this.locks[index];
-        final long stamp = lock.readLock();
+
+    public T get(long key) {
+        int index = this.getIndex(key);
+        StampedLock lock = this.locks[index];
+        long stamp = lock.readLock();
+
+        Object var7;
         try {
-            return (T)this.maps[index].get(key);
-        }
-        finally {
+            var7 = this.maps[index].get(key);
+        } finally {
             lock.unlockRead(stamp);
         }
+
+        return (T)var7;
     }
-    
-    @Override
-    public T computeIfAbsent(final long key, final LongFunction<T> factory) {
-        final int index = this.getIndex(key);
-        final StampedLock lock = this.locks[index];
-        final Long2ObjectLinkedOpenHashMap<T> map = this.maps[index];
-        final long readStamp = lock.readLock();
+
+    public T computeIfAbsent(long key, LongFunction<T> factory) {
+        int index = this.getIndex(key);
+        StampedLock lock = this.locks[index];
+        Long2ObjectLinkedOpenHashMap<T> map = this.maps[index];
+        long readStamp = lock.readLock();
+
         try {
-            final T t = (T)map.get(key);
+            T t = (T)map.get(key);
             if (t != null) {
                 return t;
             }
-        }
-        finally {
+        } finally {
             lock.unlockRead(readStamp);
         }
-        final long writeStamp = lock.writeLock();
+
+        long var19 = lock.writeLock();
+
+        Object var11;
         try {
             if (map.size() > this.sectionCapacity) {
                 map.removeFirst();
             }
-            return (T)map.computeIfAbsent(key, (LongFunction)factory);
+
+            var11 = map.computeIfAbsent(key, factory);
+        } finally {
+            lock.unlockWrite(var19);
         }
-        finally {
-            lock.unlockWrite(writeStamp);
-        }
+
+        return (T)var11;
     }
-    
-    private int getIndex(final long key) {
+
+    private int getIndex(long key) {
         return HashCommon.long2int(key) & this.mask;
     }
-    
-    private static int getSectionSize(final int size, final int factor) {
+
+    private static int getSectionSize(int size, int factor) {
         int section = size / factor;
         if (section * factor < size) {
             ++section;
         }
+
         return section;
     }
-    
+
     private static int getNearestFactor(int i) {
         int j;
-        for (j = 0; i != 0; i >>= 1, ++j) {}
+        for(j = 0; i != 0; ++j) {
+            i >>= 1;
+        }
+
         return j;
     }
 }

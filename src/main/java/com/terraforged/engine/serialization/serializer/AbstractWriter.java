@@ -1,158 +1,144 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.serialization.serializer;
 
-public abstract class AbstractWriter<T, O, A, S extends AbstractWriter<T, ?, ?, ?>> implements Writer
-{
-    private final Context root;
-    private String name;
-    private Context context;
-    
+public abstract class AbstractWriter<T, O, A, S extends AbstractWriter<T, ?, ?, ?>> implements Writer {
+    private final AbstractWriter<T, O, A, S>.Context root = new AbstractWriter.Context(null);
+    private String name = "";
+    private AbstractWriter<T, O, A, S>.Context context = this.root;
+
     public AbstractWriter() {
-        this.root = new Context((Context)null);
-        this.name = "";
-        this.context = this.root;
     }
-    
+
     public T get() {
         return (T)this.root.build();
     }
-    
-    @Override
-    public S name(final String name) {
+
+    public S name(String name) {
         this.name = name;
         return this.self();
     }
-    
-    @Override
+
     public S beginObject() {
-        return this.begin(this.createObject(), null);
+        return this.begin(this.createObject(), (A)null);
     }
-    
-    @Override
+
     public S endObject() {
         return this.end();
     }
-    
-    @Override
+
     public S beginArray() {
-        return this.begin(null, this.createArray());
+        return this.begin((O)null, this.createArray());
     }
-    
-    @Override
+
     public S endArray() {
         return this.end();
     }
-    
-    @Override
-    public S value(final String value) {
+
+    public S value(String value) {
         return this.append(this.create(value));
     }
-    
-    @Override
-    public S value(final float value) {
+
+    public S value(float value) {
         return this.append(this.create(value));
     }
-    
-    @Override
-    public S value(final int value) {
+
+    public S value(int value) {
         return this.append(this.create(value));
     }
-    
-    @Override
-    public S value(final boolean value) {
+
+    public S value(boolean value) {
         return this.append(this.create(value));
     }
-    
-    private S begin(final O object, final A array) {
+
+    private S begin(O object, A array) {
         if (this.root.isPresent()) {
-            (this.context = new Context(this.context)).set(this.name, object, array);
-        }
-        else {
+            this.context = new AbstractWriter.Context(this.context);
+            this.context.set(this.name, object, array);
+        } else {
             this.root.set(this.name, object, array);
         }
+
         return this.self();
     }
-    
+
     private S end() {
         if (this.context != this.root && this.context.isPresent()) {
-            final String name = this.context.name;
-            final T value = (T)this.context.build();
+            String name = this.context.name;
+            T value = (T)this.context.build();
             this.context = this.context.parent;
             this.append(name, value);
         }
+
         return this.self();
     }
-    
-    private S append(final T value) {
+
+    private S append(T value) {
         return this.append(this.name, value);
     }
-    
-    private S append(final String name, final T value) {
+
+    private S append(String name, T value) {
         if (this.context.objectValue != null) {
             this.add(this.context.objectValue, name, value);
-        }
-        else if (this.context.arrayValue != null) {
+        } else if (this.context.arrayValue != null) {
             this.add(this.context.arrayValue, value);
         }
+
         return this.self();
     }
-    
+
     protected abstract S self();
-    
-    protected abstract boolean isObject(final T p0);
-    
-    protected abstract boolean isArray(final T p0);
-    
-    protected abstract void add(final O p0, final String p1, final T p2);
-    
-    protected abstract void add(final A p0, final T p1);
-    
+
+    protected abstract boolean isObject(T var1);
+
+    protected abstract boolean isArray(T var1);
+
+    protected abstract void add(O var1, String var2, T var3);
+
+    protected abstract void add(A var1, T var2);
+
     protected abstract O createObject();
-    
+
     protected abstract A createArray();
-    
-    protected abstract T closeObject(final O p0);
-    
-    protected abstract T closeArray(final A p0);
-    
-    protected abstract T create(final String p0);
-    
-    protected abstract T create(final int p0);
-    
-    protected abstract T create(final float p0);
-    
-    protected abstract T create(final boolean p0);
-    
-    private class Context
-    {
-        private final Context parent;
+
+    protected abstract T closeObject(O var1);
+
+    protected abstract T closeArray(A var1);
+
+    protected abstract T create(String var1);
+
+    protected abstract T create(int var1);
+
+    protected abstract T create(float var1);
+
+    protected abstract T create(boolean var1);
+
+    private class Context {
+        private final AbstractWriter<T, O, A, S>.Context parent;
         private String name;
         private O objectValue;
         private A arrayValue;
-        
-        private Context(final Context root) {
-            this.parent = ((root != null) ? root : this);
+
+        private Context(AbstractWriter<T, O, A, S>.Context root) {
+            this.parent = root != null ? root : this;
         }
-        
+
         private T build() {
             if (this.objectValue != null) {
                 return AbstractWriter.this.closeObject(this.objectValue);
+            } else {
+                return this.arrayValue != null ? AbstractWriter.this.closeArray(this.arrayValue) : null;
             }
-            if (this.arrayValue != null) {
-                return AbstractWriter.this.closeArray(this.arrayValue);
-            }
-            return null;
         }
-        
-        private void set(final String n, final O o, final A a) {
+
+        private void set(String n, O o, A a) {
             this.name = n;
             this.objectValue = o;
             this.arrayValue = a;
         }
-        
+
         private boolean isPresent() {
             return this.objectValue != null || this.arrayValue != null;
         }

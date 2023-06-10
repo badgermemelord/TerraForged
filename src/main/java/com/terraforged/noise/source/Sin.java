@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.noise.source;
 
@@ -10,72 +10,58 @@ import com.terraforged.cereal.value.DataValue;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseUtil;
 
-public class Sin extends NoiseSource
-{
+public class Sin extends NoiseSource {
     private final Module alpha;
-    private static final DataFactory<Sin> factory;
-    
-    public Sin(final Builder builder) {
+    private static final DataFactory<Sin> factory = (data, spec, context) -> new Sin(
+            new Builder().frequency(spec.get("frequency", data, DataValue::asDouble)).source((Module)spec.get("alpha", data, Module.class, context))
+    );
+
+    public Sin(Builder builder) {
         super(builder);
         this.alpha = builder.getSource();
     }
-    
-    @Override
+
     public String getSpecName() {
         return "Sin";
     }
-    
-    @Override
-    public float getValue(float x, float y, final int seed) {
-        final float a = this.alpha.getValue(x, y);
+
+    public float getValue(float x, float y, int seed) {
+        float a = this.alpha.getValue(x, y);
         x *= this.frequency;
         y *= this.frequency;
         float noise;
-        if (a == 0.0f) {
+        if (a == 0.0F) {
             noise = NoiseUtil.sin(x);
-        }
-        else if (a == 1.0f) {
+        } else if (a == 1.0F) {
             noise = NoiseUtil.sin(y);
-        }
-        else {
-            final float sx = NoiseUtil.sin(x);
-            final float sy = NoiseUtil.sin(y);
+        } else {
+            float sx = NoiseUtil.sin(x);
+            float sy = NoiseUtil.sin(y);
             noise = NoiseUtil.lerp(sx, sy, a);
         }
-        return NoiseUtil.map(noise, -1.0f, 1.0f, 2.0f);
+
+        return NoiseUtil.map(noise, -1.0F, 1.0F, 2.0F);
     }
-    
-    @Override
-    public boolean equals(final Object o) {
+
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
+        } else if (o == null || this.getClass() != o.getClass()) {
             return false;
-        }
-        if (!super.equals(o)) {
+        } else if (!super.equals(o)) {
             return false;
+        } else {
+            Sin sin = (Sin)o;
+            return this.alpha.equals(sin.alpha);
         }
-        final Sin sin = (Sin)o;
-        return this.alpha.equals(sin.alpha);
     }
-    
-    @Override
+
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + this.alpha.hashCode();
-        return result;
+        return 31 * result + this.alpha.hashCode();
     }
-    
+
     public static DataSpec<Sin> spec() {
-        return DataSpec.builder("Sin", Sin.class, Sin.factory).add("frequency", (Object)1.0f, s -> s.frequency).addObj("alpha", s -> s.alpha).build();
-    }
-    
-    static {
-        final Sin sin;
-        factory = ((data, spec, context) -> {
-            new Sin(new Builder().frequency(spec.get("frequency", data, DataValue::asDouble)).source(spec.get("alpha", data, Module.class, context)));
-            return sin;
-        });
+        return DataSpec.builder("Sin", Sin.class, factory).add("frequency", 1.0F, s -> s.frequency).addObj("alpha", s -> s.alpha).build();
     }
 }

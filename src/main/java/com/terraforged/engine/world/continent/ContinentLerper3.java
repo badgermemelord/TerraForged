@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.continent;
 
@@ -9,8 +9,7 @@ import com.terraforged.engine.cell.Populator;
 import com.terraforged.noise.func.Interpolation;
 import com.terraforged.noise.util.NoiseUtil;
 
-public class ContinentLerper3 implements Populator
-{
+public class ContinentLerper3 implements Populator {
     private final Populator lower;
     private final Populator middle;
     private final Populator upper;
@@ -20,12 +19,12 @@ public class ContinentLerper3 implements Populator
     private final float blendUpper;
     private final float lowerRange;
     private final float upperRange;
-    
-    public ContinentLerper3(final Populator lower, final Populator middle, final Populator upper, final float min, final float mid, final float max) {
+
+    public ContinentLerper3(Populator lower, Populator middle, Populator upper, float min, float mid, float max) {
         this(lower, middle, upper, min, mid, max, Interpolation.CURVE3);
     }
-    
-    public ContinentLerper3(final Populator lower, final Populator middle, final Populator upper, final float min, final float mid, final float max, final Interpolation interpolation) {
+
+    public ContinentLerper3(Populator lower, Populator middle, Populator upper, float min, float mid, float max, Interpolation interpolation) {
         this.lower = lower;
         this.upper = upper;
         this.middle = middle;
@@ -36,31 +35,27 @@ public class ContinentLerper3 implements Populator
         this.lowerRange = this.midpoint - this.blendLower;
         this.upperRange = this.blendUpper - this.midpoint;
     }
-    
-    @Override
-    public void apply(final Cell cell, final float x, final float y) {
-        final float select = cell.continentEdge;
+
+    public void apply(Cell cell, float x, float y) {
+        float select = cell.continentEdge;
         if (select < this.blendLower) {
             this.lower.apply(cell, x, y);
-            return;
-        }
-        if (select > this.blendUpper) {
+        } else if (select > this.blendUpper) {
             this.upper.apply(cell, x, y);
-            return;
-        }
-        if (select < this.midpoint) {
-            final float alpha = this.interpolation.apply((select - this.blendLower) / this.lowerRange);
-            this.lower.apply(cell, x, y);
-            final float lowerVal = cell.value;
-            this.middle.apply(cell, x, y);
-            cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
-        }
-        else {
-            final float alpha = this.interpolation.apply((select - this.midpoint) / this.upperRange);
-            this.middle.apply(cell, x, y);
-            final float lowerVal = cell.value;
-            this.upper.apply(cell, x, y);
-            cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
+        } else {
+            if (select < this.midpoint) {
+                float alpha = this.interpolation.apply((select - this.blendLower) / this.lowerRange);
+                this.lower.apply(cell, x, y);
+                float lowerVal = cell.value;
+                this.middle.apply(cell, x, y);
+                cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
+            } else {
+                float alpha = this.interpolation.apply((select - this.midpoint) / this.upperRange);
+                this.middle.apply(cell, x, y);
+                float lowerVal = cell.value;
+                this.upper.apply(cell, x, y);
+                cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
+            }
         }
     }
 }

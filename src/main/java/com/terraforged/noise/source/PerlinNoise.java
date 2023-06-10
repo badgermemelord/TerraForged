@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.noise.source;
@@ -61,21 +60,19 @@ public class PerlinNoise extends NoiseSource {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (o != null && this.getClass() == o.getClass()) {
-            if (!super.equals(o)) {
+        } else if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        } else if (!super.equals(o)) {
+            return false;
+        } else {
+            PerlinNoise that = (PerlinNoise)o;
+            if (Float.compare(that.min, this.min) != 0) {
+                return false;
+            } else if (Float.compare(that.max, this.max) != 0) {
                 return false;
             } else {
-                PerlinNoise that = (PerlinNoise)o;
-                if (Float.compare(that.min, this.min) != 0) {
-                    return false;
-                } else if (Float.compare(that.max, this.max) != 0) {
-                    return false;
-                } else {
-                    return Float.compare(that.range, this.range) == 0;
-                }
+                return Float.compare(that.range, this.range) == 0;
             }
-        } else {
-            return false;
         }
     }
 
@@ -83,8 +80,7 @@ public class PerlinNoise extends NoiseSource {
         int result = super.hashCode();
         result = 31 * result + (this.min != 0.0F ? Float.floatToIntBits(this.min) : 0);
         result = 31 * result + (this.max != 0.0F ? Float.floatToIntBits(this.max) : 0);
-        result = 31 * result + (this.range != 0.0F ? Float.floatToIntBits(this.range) : 0);
-        return result;
+        return 31 * result + (this.range != 0.0F ? Float.floatToIntBits(this.range) : 0);
     }
 
     protected float min(int octaves, float gain) {

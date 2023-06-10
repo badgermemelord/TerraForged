@@ -1,6 +1,5 @@
 //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
+// Source code recreated from a .class file by Quiltflower
 //
 
 package com.terraforged.noise.source;
@@ -22,28 +21,23 @@ public class Builder {
     public static final float DEFAULT_LACUNARITY = 2.0F;
     public static final float DEFAULT_FREQUENCY = 1.0F;
     public static final float DEFAULT_DISTANCE = 1.0F;
-    public static final CellFunc DEFAULT_CELL_FUNC;
-    public static final EdgeFunc DEFAULT_EDGE_FUNC;
-    public static final DistanceFunc DEFAULT_DIST_FUNC;
-    public static Interpolation DEFAULT_INTERPOLATION;
+    public static final CellFunc DEFAULT_CELL_FUNC = CellFunc.CELL_VALUE;
+    public static final EdgeFunc DEFAULT_EDGE_FUNC = EdgeFunc.DISTANCE_2;
+    public static final DistanceFunc DEFAULT_DIST_FUNC = DistanceFunc.EUCLIDEAN;
+    public static Interpolation DEFAULT_INTERPOLATION = Interpolation.CURVE3;
     private int seed = 1337;
     private int octaves = 1;
     private float gain = Float.MAX_VALUE;
     private float lacunarity = 2.0F;
     private float frequency = 1.0F;
     private float displacement = 1.0F;
-    private Module source;
-    private CellFunc cellFunc;
-    private EdgeFunc edgeFunc;
-    private DistanceFunc distFunc;
-    private Interpolation interpolation;
+    private Module source = Source.ZERO;
+    private CellFunc cellFunc = DEFAULT_CELL_FUNC;
+    private EdgeFunc edgeFunc = DEFAULT_EDGE_FUNC;
+    private DistanceFunc distFunc = DEFAULT_DIST_FUNC;
+    private Interpolation interpolation = DEFAULT_INTERPOLATION;
 
     public Builder() {
-        this.source = Source.ZERO;
-        this.cellFunc = DEFAULT_CELL_FUNC;
-        this.edgeFunc = DEFAULT_EDGE_FUNC;
-        this.distFunc = DEFAULT_DIST_FUNC;
-        this.interpolation = DEFAULT_INTERPOLATION;
     }
 
     public int getSeed() {
@@ -226,12 +220,5 @@ public class Builder {
             var3.printStackTrace();
             return this.perlin();
         }
-    }
-
-    static {
-        DEFAULT_CELL_FUNC = CellFunc.CELL_VALUE;
-        DEFAULT_EDGE_FUNC = EdgeFunc.DISTANCE_2;
-        DEFAULT_DIST_FUNC = DistanceFunc.EUCLIDEAN;
-        DEFAULT_INTERPOLATION = Interpolation.CURVE3;
     }
 }

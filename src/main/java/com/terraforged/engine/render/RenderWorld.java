@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.render;
 
@@ -13,8 +13,7 @@ import com.terraforged.engine.tile.Tile;
 import com.terraforged.engine.tile.gen.TileGenerator;
 import com.terraforged.engine.world.heightmap.HeightmapCache;
 
-public class RenderWorld
-{
+public class RenderWorld {
     private final int regionCount;
     private final Size regionSize;
     private final RenderAPI context;
@@ -24,123 +23,126 @@ public class RenderWorld
     private final RenderRegion[] view;
     private final LazyCallable<RenderRegion>[] queue;
     private final HeightmapCache heightmapCache;
-    
-    public RenderWorld(final ThreadPool threadPool, final TileGenerator generator, final RenderAPI context, final RenderSettings settings, final int regionCount, final int regionSize) {
+
+    public RenderWorld(ThreadPool threadPool, TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
         this.threadPool = threadPool;
         this.context = context;
         this.generator = generator;
         this.regionCount = regionCount;
         this.renderer = new RegionRenderer(context, settings);
         this.regionSize = Size.blocks(regionSize, 0);
-        this.queue = (LazyCallable<RenderRegion>[])new LazyCallable[regionCount * regionCount];
+        this.queue = new LazyCallable[regionCount * regionCount];
         this.view = new RenderRegion[regionCount * regionCount];
         this.heightmapCache = new HeightmapCache(generator.getGenerator().getHeightmap());
     }
-    
+
     public int getResolution() {
         return this.regionSize.total;
     }
-    
+
     public int getSize() {
         return this.regionSize.total * this.regionCount;
     }
-    
+
     public boolean isRendering() {
-        for (final LazyCallable<?> entry : this.queue) {
+        for(LazyCallable<?> entry : this.queue) {
             if (entry != null) {
                 return true;
             }
         }
+
         return false;
     }
-    
+
     public Cell getCenter() {
-        final float cx = this.regionCount / 2.0f;
-        final float cz = this.regionCount / 2.0f;
-        final int rx = (int)cx;
-        final int rz = (int)cz;
-        final int index = rx + this.regionCount * rz;
-        final RenderRegion renderRegion = this.view[index];
+        float cx = (float)this.regionCount / 2.0F;
+        float cz = (float)this.regionCount / 2.0F;
+        int rx = (int)cx;
+        int rz = (int)cz;
+        int index = rx + this.regionCount * rz;
+        RenderRegion renderRegion = this.view[index];
         if (renderRegion == null) {
             return Cell.empty();
+        } else {
+            float ox = cx - (float)rx;
+            float oz = cz - (float)rz;
+            Tile tile = renderRegion.getTile();
+            int dx = (int)((float)tile.getBlockSize().size * ox);
+            int dz = (int)((float)tile.getBlockSize().size * oz);
+            return tile.getCell(dx, dz);
         }
-        final float ox = cx - rx;
-        final float oz = cz - rz;
-        final Tile tile = renderRegion.getTile();
-        final int dx = (int)(tile.getBlockSize().size * ox);
-        final int dz = (int)(tile.getBlockSize().size * oz);
-        return tile.getCell(dx, dz);
     }
-    
+
     public void redraw() {
-        for (final RenderRegion region : this.view) {
+        for(RenderRegion region : this.view) {
             if (region != null) {
                 this.renderer.render(region);
             }
         }
     }
-    
+
     public void refresh() {
-        for (final LazyCallable<?> entry : this.queue) {
+        for(LazyCallable<?> entry : this.queue) {
             if (entry != null && !entry.isDone()) {
                 return;
             }
         }
-        for (int i = 0; i < this.queue.length; ++i) {
-            final LazyCallable<RenderRegion> entry2 = this.queue[i];
-            if (entry2 != null) {
-                if (entry2.isDone()) {
-                    this.queue[i] = null;
-                    this.view[i] = entry2.get();
-                }
+
+        for(int i = 0; i < this.queue.length; ++i) {
+            LazyCallable<RenderRegion> entry = this.queue[i];
+            if (entry != null && entry.isDone()) {
+                this.queue[i] = null;
+                this.view[i] = (RenderRegion)entry.get();
             }
         }
     }
-    
-    public void update(final float x, final float y, final float zoom, final boolean filters) {
+
+    public void update(float x, float y, float zoom, boolean filters) {
         this.renderer.getSettings().zoom = zoom;
         this.renderer.getSettings().resolution = this.getResolution();
-        final float factor = (this.regionCount > 1) ? ((this.regionCount - 1.0f) / this.regionCount) : 0.0f;
-        final float offset = this.regionSize.size * zoom * factor;
-        for (int rz = 0; rz < this.regionCount; ++rz) {
-            for (int rx = 0; rx < this.regionCount; ++rx) {
-                final int index = rx + rz * this.regionCount;
-                final float px = x + rx * this.regionSize.size * zoom - offset;
-                final float py = y + rz * this.regionSize.size * zoom - offset;
+        float factor = this.regionCount > 1 ? ((float)this.regionCount - 1.0F) / (float)this.regionCount : 0.0F;
+        float offset = (float)this.regionSize.size * zoom * factor;
+
+        for(int rz = 0; rz < this.regionCount; ++rz) {
+            for(int rx = 0; rx < this.regionCount; ++rx) {
+                int index = rx + rz * this.regionCount;
+                float px = x + (float)(rx * this.regionSize.size) * zoom - offset;
+                float py = y + (float)(rz * this.regionSize.size) * zoom - offset;
                 this.queue[index] = this.generator.getTile(px, py, zoom, filters).then(this.threadPool, this.renderer::render);
             }
         }
     }
-    
+
     public void render() {
-        final int resolution = this.getResolution();
-        final float w = this.renderer.getSettings().width / (float)(resolution - 1);
-        final float h = this.renderer.getSettings().width / (float)(resolution - 1);
-        final float offsetX = this.regionSize.size * this.regionCount * w / 2.0f;
-        final float offsetY = this.regionSize.size * this.regionCount * w / 2.0f;
+        int resolution = this.getResolution();
+        float w = (float)this.renderer.getSettings().width / (float)(resolution - 1);
+        float h = (float)this.renderer.getSettings().width / (float)(resolution - 1);
+        float offsetX = (float)(this.regionSize.size * this.regionCount) * w / 2.0F;
+        float offsetY = (float)(this.regionSize.size * this.regionCount) * w / 2.0F;
         this.context.pushMatrix();
-        this.context.translate(-offsetX, -offsetY, 0.0f);
-        for (int rz = 0; rz < this.regionCount; ++rz) {
-            for (int rx = 0; rx < this.regionCount; ++rx) {
-                final int index = rx + rz * this.regionCount;
-                final RenderRegion region = this.view[index];
+        this.context.translate(-offsetX, -offsetY, 0.0F);
+
+        for(int rz = 0; rz < this.regionCount; ++rz) {
+            for(int rx = 0; rx < this.regionCount; ++rx) {
+                int index = rx + rz * this.regionCount;
+                RenderRegion region = this.view[index];
                 if (region != null) {
                     this.context.pushMatrix();
-                    final float x = rx * this.regionSize.size * w;
-                    final float z = rz * this.regionSize.size * h;
-                    this.context.translate(x, z, 0.0f);
+                    float x = (float)(rx * this.regionSize.size) * w;
+                    float z = (float)(rz * this.regionSize.size) * h;
+                    this.context.translate(x, z, 0.0F);
                     region.getMesh().draw();
                     this.context.popMatrix();
                 }
             }
         }
+
         this.context.popMatrix();
     }
-    
-    private CacheEntry<Tile> getAsync(final float x, final float z, final float zoom, final boolean filters) {
-        final Tile tile;
-        return new CacheEntry<Tile>(CacheEntry.computeAsync(() -> {
-            tile = this.generator.createEmptyRegion(0, 0);
+
+    private CacheEntry<Tile> getAsync(float x, float z, float zoom, boolean filters) {
+        return new CacheEntry(CacheEntry.computeAsync(() -> {
+            Tile tile = this.generator.createEmptyRegion(0, 0);
             tile.generate(this.heightmapCache, x, z, zoom);
             return tile;
         }, this.threadPool));
