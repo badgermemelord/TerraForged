@@ -8,74 +8,70 @@ import com.terraforged.cereal.spec.SpecName;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 
-public interface Domain extends SpecName
-{
-    public static final Domain DIRECT = new Domain() {
-        @Override
+public interface Domain extends SpecName {
+    Domain DIRECT = new Domain() {
         public String getSpecName() {
             return "Direct";
         }
-        
-        @Override
-        public float getOffsetX(final float x, final float y) {
-            return 0.0f;
+
+        public float getOffsetX(float x, float y) {
+            return 0.0F;
         }
-        
-        @Override
-        public float getOffsetY(final float x, final float y) {
-            return 0.0f;
+
+        public float getOffsetY(float x, float y) {
+            return 0.0F;
         }
     };
-    
-    float getOffsetX(final float p0, final float p1);
-    
-    float getOffsetY(final float p0, final float p1);
-    
-    default float getX(final float x, final float y) {
+
+    float getOffsetX(float var1, float var2);
+
+    float getOffsetY(float var1, float var2);
+
+    default float getX(float x, float y) {
         return x + this.getOffsetX(x, y);
     }
-    
-    default float getY(final float x, final float y) {
+
+    default float getY(float x, float y) {
         return y + this.getOffsetY(x, y);
     }
-    
+
     default Domain cache() {
         return new CacheWarp(this);
     }
-    
-    default Domain add(final Domain next) {
+
+    default Domain add(Domain next) {
         return new AddWarp(this, next);
     }
-    
-    default Domain warp(final Domain next) {
+
+    default Domain warp(Domain next) {
         return new CompoundWarp(this, next);
     }
-    
-    default Domain then(final Domain next) {
+
+    default Domain then(Domain next) {
         return new CumulativeWarp(this, next);
     }
-    
-    default Domain warp(final Module x, final Module y, final Module distance) {
+
+    static Domain warp(Module x, Module y, Module distance) {
         return new DomainWarp(x, y, distance);
     }
-    
-    default Domain warp(final int seed, final int scale, final int octaves, final double strength) {
+
+    static Domain warp(int seed, int scale, int octaves, double strength) {
         return warp(Source.PERLIN, seed, scale, octaves, strength);
     }
-    
-    default Domain warp(final Source type, final int seed, final int scale, final int octaves, final double strength) {
+
+    static Domain warp(Source type, int seed, int scale, int octaves, double strength) {
         return warp(Source.build(seed, scale, octaves).build(type), Source.build(seed + 1, scale, octaves).build(type), Source.constant(strength));
     }
-    
-    default Domain direction(final Module direction, final Module distance) {
+
+    static Domain direction(Module direction, Module distance) {
         return new DirectionWarp(direction, distance);
     }
-    
-    default Domain direction(final int seed, final int scale, final int octaves, final double strength) {
+
+    static Domain direction(int seed, int scale, int octaves, double strength) {
         return direction(Source.PERLIN, seed, scale, octaves, strength);
     }
-    
-    default Domain direction(final Source type, final int seed, final int scale, final int octaves, final double strength) {
+
+    static Domain direction(Source type, int seed, int scale, int octaves, double strength) {
         return direction(Source.build(seed, scale, octaves).build(type), Source.constant(strength));
     }
 }

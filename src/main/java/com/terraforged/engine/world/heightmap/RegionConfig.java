@@ -1,18 +1,20 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package com.terraforged.engine.world.heightmap;
 
-public class RegionConfig
-{
+import com.terraforged.noise.Module;
+
+public class RegionConfig {
     public final int seed;
     public final int scale;
     public final Module warpX;
     public final Module warpZ;
     public final double warpStrength;
-    
-    public RegionConfig(final int seed, final int scale, final Module warpX, final Module warpZ, final double warpStrength) {
+
+    public RegionConfig(int seed, int scale, Module warpX, Module warpZ, double warpStrength) {
         this.seed = seed;
         this.scale = scale;
         this.warpX = warpX;

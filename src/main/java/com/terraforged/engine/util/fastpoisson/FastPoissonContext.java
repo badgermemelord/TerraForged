@@ -1,13 +1,14 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package com.terraforged.engine.util.fastpoisson;
 
+import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseUtil;
 
-public class FastPoissonContext
-{
+public class FastPoissonContext {
     public final int radius;
     public final int radius2;
     public final float jitter;
@@ -15,14 +16,14 @@ public class FastPoissonContext
     public final float frequency;
     public final float scale;
     public final Module density;
-    
-    public FastPoissonContext(final int radius, final float jitter, final float frequency, final Module density) {
+
+    public FastPoissonContext(int radius, float jitter, float frequency, Module density) {
         this.radius = radius;
         this.density = density;
-        this.frequency = Math.min(0.5f, frequency);
-        this.scale = 1.0f / this.frequency;
-        this.jitter = NoiseUtil.clamp(jitter, 0.0f, 1.0f);
-        this.pad = (1.0f - this.jitter) * 0.5f;
+        this.frequency = Math.min(0.5F, frequency);
+        this.scale = 1.0F / this.frequency;
+        this.jitter = NoiseUtil.clamp(jitter, 0.0F, 1.0F);
+        this.pad = (1.0F - this.jitter) * 0.5F;
         this.radius2 = radius * radius;
     }
 }

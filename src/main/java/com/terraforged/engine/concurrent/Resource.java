@@ -1,34 +1,31 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package com.terraforged.engine.concurrent;
 
 import com.terraforged.engine.concurrent.cache.SafeCloseable;
 
-public interface Resource<T> extends SafeCloseable
-{
-    public static final Resource NONE = new Resource() {
-        @Override
+public interface Resource<T> extends SafeCloseable {
+    Resource NONE = new Resource() {
         public Object get() {
             return null;
         }
-        
-        @Override
+
         public boolean isOpen() {
             return false;
         }
-        
-        @Override
+
         public void close() {
         }
     };
-    
+
     T get();
-    
+
     boolean isOpen();
-    
-    default <T> Resource<T> empty() {
-        return (Resource<T>)Resource.NONE;
+
+    static <T> Resource<T> empty() {
+        return NONE;
     }
 }

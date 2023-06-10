@@ -1,15 +1,14 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package com.terraforged.engine.concurrent;
 
-public interface Disposable
-{
+public interface Disposable {
     void dispose();
-    
-    public interface Listener<T>
-    {
-        void onDispose(final T p0);
+
+    public interface Listener<T> {
+        void onDispose(T var1);
     }
 }

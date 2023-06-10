@@ -1,34 +1,35 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package com.terraforged.engine.concurrent;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ThreadLocalResource<T> extends ThreadLocal<Resource<T>>
-{
+public class ThreadLocalResource<T> extends ThreadLocal<Resource<T>> {
     private final Supplier<Resource<T>> supplier;
-    
-    private ThreadLocalResource(final Supplier<Resource<T>> supplier) {
+
+    private ThreadLocalResource(Supplier<Resource<T>> supplier) {
         this.supplier = supplier;
     }
-    
+
     public T open() {
-        return this.get().get();
+        return (T) ((Resource)this.get()).get();
     }
-    
+
     public void close() {
-        this.get().close();
+        ((Resource)this.get()).close();
     }
-    
-    @Override
+
     protected Resource<T> initialValue() {
-        return this.supplier.get();
+        return (Resource)this.supplier.get();
     }
-    
-    public static <T> ThreadLocalResource<T> withInitial(final Supplier<T> supplier, final Consumer<T> consumer) {
-        return new ThreadLocalResource<T>(() -> new SimpleResource(supplier.get(), (Consumer<Object>)consumer));
+
+    public static <T> ThreadLocalResource<T> withInitial(Supplier<T> supplier, Consumer<T> consumer) {
+        return new ThreadLocalResource(() -> {
+            return new SimpleResource(supplier.get(), consumer);
+        });
     }
 }
