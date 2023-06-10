@@ -1,43 +1,42 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.type;
 
 import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 
-public class BiomeTypeLoader
-{
+public class BiomeTypeLoader {
     private static BiomeTypeLoader instance;
-    private final BiomeType[][] map;
-    
+    private final BiomeType[][] map = new BiomeType[256][256];
+
     public BiomeTypeLoader() {
-        this.map = new BiomeType[256][256];
         this.generateTypeMap();
     }
-    
+
     public BiomeType[][] getTypeMap() {
         return this.map;
     }
-    
-    public Vec2f[] getRanges(final BiomeType type) {
-        float minTemp = 1.0f;
-        float maxTemp = 0.0f;
-        float minMoist = 1.0f;
-        float maxMoist = 0.0f;
-        for (int moist = 0; moist < this.map.length; ++moist) {
-            final BiomeType[] row = this.map[moist];
-            for (int temp = 0; temp < row.length; ++temp) {
-                final BiomeType t = row[temp];
+
+    public Vec2f[] getRanges(BiomeType type) {
+        float minTemp = 1.0F;
+        float maxTemp = 0.0F;
+        float minMoist = 1.0F;
+        float maxMoist = 0.0F;
+
+        for(int moist = 0; moist < this.map.length; ++moist) {
+            BiomeType[] row = this.map[moist];
+
+            for(int temp = 0; temp < row.length; ++temp) {
+                BiomeType t = row[temp];
                 if (t == type) {
-                    final float temperature = temp / (float)(row.length - 1);
-                    final float moisture = moist / (float)(this.map.length - 1);
+                    float temperature = (float)temp / (float)(row.length - 1);
+                    float moisture = (float)moist / (float)(this.map.length - 1);
                     minTemp = Math.min(minTemp, temperature);
                     maxTemp = Math.max(maxTemp, temperature);
                     minMoist = Math.min(minMoist, moisture);
@@ -45,78 +44,78 @@ public class BiomeTypeLoader
                 }
             }
         }
-        return new Vec2f[] { new Vec2f(minTemp, maxTemp), new Vec2f(minMoist, maxMoist) };
+
+        return new Vec2f[]{new Vec2f(minTemp, maxTemp), new Vec2f(minMoist, maxMoist)};
     }
-    
-    private BiomeType getType(final int x, final int y) {
+
+    private BiomeType getType(int x, int y) {
         return this.map[y][x];
     }
-    
+
     private void generateTypeMap() {
         try {
-            final BufferedImage image = ImageIO.read(BiomeType.class.getResourceAsStream("/biomes.png"));
-            final float xf = image.getWidth() / 256.0f;
-            final float yf = image.getHeight() / 256.0f;
-            for (int y = 0; y < 256; ++y) {
-                for (int x = 0; x < 256; ++x) {
+            BufferedImage image = ImageIO.read(BiomeType.class.getResourceAsStream("/biomes.png"));
+            float xf = (float)image.getWidth() / 256.0F;
+            float yf = (float)image.getHeight() / 256.0F;
+
+            for(int y = 0; y < 256; ++y) {
+                for(int x = 0; x < 256; ++x) {
                     if (255 - y > x) {
                         this.map[255 - y][x] = BiomeType.ALPINE;
-                    }
-                    else {
-                        final int ix = NoiseUtil.round(x * xf);
-                        final int iy = NoiseUtil.round(y * yf);
-                        final int argb = image.getRGB(ix, iy);
-                        final Color color = fromARGB(argb);
+                    } else {
+                        int ix = NoiseUtil.round((float)x * xf);
+                        int iy = NoiseUtil.round((float)y * yf);
+                        int argb = image.getRGB(ix, iy);
+                        Color color = fromARGB(argb);
                         this.map[255 - y][x] = forColor(color);
                     }
                 }
             }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException var10) {
+            throw new RuntimeException(var10);
         }
     }
-    
-    private static BiomeType forColor(final Color color) {
+
+    private static BiomeType forColor(Color color) {
         BiomeType type = null;
         int closest = Integer.MAX_VALUE;
-        for (final BiomeType t : BiomeType.values()) {
-            final int distance2 = getDistance2(color, t.getLookup());
+
+        for(BiomeType t : BiomeType.values()) {
+            int distance2 = getDistance2(color, t.getLookup());
             if (distance2 < closest) {
                 closest = distance2;
                 type = t;
             }
         }
-        if (type == null) {
-            return BiomeType.GRASSLAND;
-        }
-        return type;
+
+        return type == null ? BiomeType.GRASSLAND : type;
     }
-    
-    private static int getDistance2(final Color a, final Color b) {
-        final int dr = a.getRed() - b.getRed();
-        final int dg = a.getGreen() - b.getGreen();
-        final int db = a.getBlue() - b.getBlue();
+
+    private static int getDistance2(Color a, Color b) {
+        int dr = a.getRed() - b.getRed();
+        int dg = a.getGreen() - b.getGreen();
+        int db = a.getBlue() - b.getBlue();
         return dr * dr + dg * dg + db * db;
     }
-    
-    private static Color fromARGB(final int argb) {
-        final int b = argb & 0xFF;
-        final int g = argb >> 8 & 0xFF;
-        final int r = argb >> 16 & 0xFF;
+
+    private static Color fromARGB(int argb) {
+        int b = argb & 0xFF;
+        int g = argb >> 8 & 0xFF;
+        int r = argb >> 16 & 0xFF;
         return new Color(r, g, b);
     }
-    
-    private static int dist2(final int x1, final int y1, final int x2, final int y2) {
-        final int dx = x1 - x2;
-        final int dy = y1 - y2;
+
+    private static int dist2(int x1, int y1, int x2, int y2) {
+        int dx = x1 - x2;
+        int dy = y1 - y2;
         return dx * dx + dy * dy;
     }
-    
+
     public static BiomeTypeLoader getInstance() {
-        if (BiomeTypeLoader.instance == null) {
-            BiomeTypeLoader.instance = new BiomeTypeLoader();
+        if (instance == null) {
+            instance = new BiomeTypeLoader();
         }
-        return BiomeTypeLoader.instance;
+
+        return instance;
     }
 }

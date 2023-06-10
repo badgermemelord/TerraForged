@@ -1,13 +1,12 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.climate;
 
 import com.terraforged.noise.Module;
 
-public class Compressor implements Module
-{
+public class Compressor implements Module {
     private final float lowerStart;
     private final float lowerEnd;
     private final float lowerRange;
@@ -19,12 +18,12 @@ public class Compressor implements Module
     private final float compression;
     private final float compressionRange;
     private final Module module;
-    
-    public Compressor(final Module module, final float inset, final float amount) {
-        this(module, inset, inset + amount, 1.0f - inset - amount, 1.0f - inset);
+
+    public Compressor(Module module, float inset, float amount) {
+        this(module, inset, inset + amount, 1.0F - inset - amount, 1.0F - inset);
     }
-    
-    public Compressor(final Module module, final float lowerStart, final float lowerEnd, final float upperStart, final float upperEnd) {
+
+    public Compressor(Module module, float lowerStart, float lowerEnd, float upperStart, float upperEnd) {
         this.module = module;
         this.lowerStart = lowerStart;
         this.lowerEnd = lowerEnd;
@@ -32,26 +31,25 @@ public class Compressor implements Module
         this.lowerExpandRange = lowerEnd;
         this.upperStart = upperStart;
         this.upperEnd = upperEnd;
-        this.upperRange = 1.0f - upperEnd;
-        this.upperExpandedRange = 1.0f - upperStart;
+        this.upperRange = 1.0F - upperEnd;
+        this.upperExpandedRange = 1.0F - upperStart;
         this.compression = upperStart - lowerEnd;
         this.compressionRange = upperEnd - lowerStart;
     }
-    
-    @Override
-    public float getValue(final float x, final float y) {
-        final float value = this.module.getValue(x, y);
+
+    public float getValue(float x, float y) {
+        float value = this.module.getValue(x, y);
         if (value <= this.lowerStart) {
-            final float alpha = value / this.lowerRange;
+            float alpha = value / this.lowerRange;
             return alpha * this.lowerExpandRange;
+        } else if (value >= this.upperEnd) {
+            float delta = value - this.upperEnd;
+            float alpha = delta / this.upperRange;
+            return this.upperStart + alpha * this.upperExpandedRange;
+        } else {
+            float delta = value - this.lowerStart;
+            float alpha = delta / this.compressionRange;
+            return this.lowerEnd + alpha * this.compression;
         }
-        if (value >= this.upperEnd) {
-            final float delta = value - this.upperEnd;
-            final float alpha2 = delta / this.upperRange;
-            return this.upperStart + alpha2 * this.upperExpandedRange;
-        }
-        final float delta = value - this.lowerStart;
-        final float alpha2 = delta / this.compressionRange;
-        return this.lowerEnd + alpha2 * this.compression;
     }
 }

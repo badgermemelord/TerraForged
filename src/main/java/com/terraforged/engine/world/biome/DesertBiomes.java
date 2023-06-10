@@ -1,20 +1,16 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome;
 
 import com.terraforged.engine.util.ListUtils;
 import com.terraforged.engine.world.biome.map.BiomeContext;
-import it.unimi.dsi.fastutil.ints.IntCollection;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-import java.util.Comparator;
-
-public class DesertBiomes
-{
+public class DesertBiomes {
     private final IntSet reds;
     private final IntSet whites;
     private final IntSet deserts;
@@ -24,37 +20,38 @@ public class DesertBiomes
     private final int maxWhiteIndex;
     private final int defaultRed;
     private final int defaultWhite;
-    
-    public DesertBiomes(final IntList deserts, final IntList redSand, final IntList whiteSand, final int defaultRed, final int defaultWhite, final BiomeContext<?> context) {
-        this.deserts = (IntSet)new IntOpenHashSet((IntCollection)deserts);
-        this.whites = (IntSet)new IntOpenHashSet((IntCollection)whiteSand);
-        this.reds = (IntSet)new IntOpenHashSet((IntCollection)redSand);
+
+    public DesertBiomes(IntList deserts, IntList redSand, IntList whiteSand, int defaultRed, int defaultWhite, BiomeContext<?> context) {
+        this.deserts = new IntOpenHashSet(deserts);
+        this.whites = new IntOpenHashSet(whiteSand);
+        this.reds = new IntOpenHashSet(redSand);
         this.redSand = redSand;
-        (this.whiteSand = whiteSand).sort((Comparator)context);
-        this.redSand.sort((Comparator)context);
+        this.whiteSand = whiteSand;
+        this.whiteSand.sort(context);
+        this.redSand.sort(context);
         this.maxRedIndex = redSand.size() - 1;
         this.maxWhiteIndex = whiteSand.size() - 1;
         this.defaultRed = defaultRed;
         this.defaultWhite = defaultWhite;
     }
-    
-    public boolean isDesert(final int biome) {
+
+    public boolean isDesert(int biome) {
         return this.deserts.contains(biome);
     }
-    
-    public boolean isRedDesert(final int biome) {
+
+    public boolean isRedDesert(int biome) {
         return this.reds.contains(biome);
     }
-    
-    public boolean isWhiteDesert(final int biome) {
+
+    public boolean isWhiteDesert(int biome) {
         return this.whites.contains(biome);
     }
-    
-    public int getRedDesert(final float shape) {
+
+    public int getRedDesert(float shape) {
         return ListUtils.get(this.redSand, this.maxRedIndex, shape, this.defaultRed);
     }
-    
-    public int getWhiteDesert(final float shape) {
+
+    public int getWhiteDesert(float shape) {
         return ListUtils.get(this.whiteSand, this.maxWhiteIndex, shape, this.defaultWhite);
     }
 }

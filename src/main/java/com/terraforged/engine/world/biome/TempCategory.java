@@ -1,12 +1,14 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome;
 
-public enum TempCategory
-{
-    COLD, 
-    MEDIUM, 
+public enum TempCategory {
+    COLD,
+    MEDIUM,
     WARM;
+
+    private TempCategory() {
+    }
 }
