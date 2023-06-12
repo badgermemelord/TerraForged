@@ -9,6 +9,8 @@ import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
 import java.awt.Color;
 
+import static com.terraforged.mod.TerraForged.LOG;
+
 public enum BiomeType {
     TROPICAL_RAINFOREST(7, 83, 48, new Color(7, 83, 48)),
     SAVANNA(151, 165, 39, new Color(151, 165, 39)),
@@ -32,11 +34,11 @@ public enum BiomeType {
     private float minMoist;
     private float maxMoist;
 
-    private BiomeType(int r, int g, int b, Color color) {
+     BiomeType(int r, int g, int b, Color color) {
         this(new Color(r, g, b), color);
     }
 
-    private BiomeType(Color lookup, Color color) {
+     BiomeType(Color lookup, Color color) {
         this.lookup = lookup;
         this.color = BiomeTypeColors.getInstance().getColor(this.name(), color);
     }
@@ -128,6 +130,8 @@ public enum BiomeType {
     }
 
     private static void init() {
+        System.out.println("late balls");
+
         for(BiomeType type : values()) {
             Vec2f[] ranges = BiomeTypeLoader.getInstance().getRanges(type);
             type.minTemp = ranges[0].x;
@@ -135,9 +139,15 @@ public enum BiomeType {
             type.minMoist = ranges[1].x;
             type.maxMoist = ranges[1].y;
         }
+
     }
 
+
     static {
+        System.out.println("initial balls");
         init();
+
     }
+
+
 }

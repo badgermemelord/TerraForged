@@ -1,11 +1,10 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.map.defaults;
 
-public class DefaultBiomes
-{
+public class DefaultBiomes {
     public final DefaultBiome beach;
     public final DefaultBiome coast;
     public final DefaultBiome river;
@@ -16,8 +15,19 @@ public class DefaultBiomes
     public final DefaultBiome mountain;
     public final DefaultBiome volcanoes;
     public final DefaultBiome land;
-    
-    public DefaultBiomes(final DefaultBiome beach, final DefaultBiome coast, final DefaultBiome river, final DefaultBiome lake, final DefaultBiome wetland, final DefaultBiome ocean, final DefaultBiome deepOcean, final DefaultBiome mountain, final DefaultBiome volcanos, final DefaultBiome land) {
+
+    public DefaultBiomes(
+            DefaultBiome beach,
+            DefaultBiome coast,
+            DefaultBiome river,
+            DefaultBiome lake,
+            DefaultBiome wetland,
+            DefaultBiome ocean,
+            DefaultBiome deepOcean,
+            DefaultBiome mountain,
+            DefaultBiome volcanos,
+            DefaultBiome land
+    ) {
         this.beach = beach;
         this.coast = coast;
         this.river = river;

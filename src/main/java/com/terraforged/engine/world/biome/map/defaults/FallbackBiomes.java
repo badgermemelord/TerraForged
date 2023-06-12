@@ -1,11 +1,10 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.map.defaults;
 
-public class FallbackBiomes<T>
-{
+public class FallbackBiomes<T> {
     public final T river;
     public final T lake;
     public final T beach;
@@ -13,8 +12,8 @@ public class FallbackBiomes<T>
     public final T deepOcean;
     public final T wetland;
     public final T land;
-    
-    public FallbackBiomes(final T river, final T lake, final T beach, final T ocean, final T deepOcean, final T wetland, final T land) {
+
+    public FallbackBiomes(T river, T lake, T beach, T ocean, T deepOcean, T wetland, T land) {
         this.river = river;
         this.lake = lake;
         this.beach = beach;

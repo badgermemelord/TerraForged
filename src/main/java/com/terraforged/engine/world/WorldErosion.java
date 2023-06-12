@@ -1,68 +1,69 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.IntFunction;
 
-public class WorldErosion<T>
-{
-    private volatile T value;
+public class WorldErosion<T> {
+    private volatile T value = (T)null;
     private final IntFunction<T> factory;
-    private final Validator<T> validator;
-    private final StampedLock lock;
-    
-    public WorldErosion(final IntFunction<T> factory, final Validator<T> validator) {
-        this.value = null;
-        this.lock = new StampedLock();
+    private final WorldErosion.Validator<T> validator;
+    private final StampedLock lock = new StampedLock();
+
+    public WorldErosion(IntFunction<T> factory, WorldErosion.Validator<T> validator) {
         this.factory = factory;
         this.validator = validator;
     }
-    
-    public T get(final int ctx) {
-        final T value = this.readValue();
-        if (this.validate(value, ctx)) {
-            return value;
-        }
-        return this.writeValue(ctx);
+
+    public T get(int ctx) {
+        T value = this.readValue();
+        return (T)(this.validate(value, ctx) ? value : this.writeValue(ctx));
     }
-    
+
     private T readValue() {
-        final long optRead = this.lock.tryOptimisticRead();
-        final T value = this.value;
+        long optRead = this.lock.tryOptimisticRead();
+        T value = this.value;
         if (!this.lock.validate(optRead)) {
-            final long stamp = this.lock.readLock();
+            long stamp = this.lock.readLock();
+
+            Object var6;
             try {
-                return this.value;
-            }
-            finally {
+                var6 = this.value;
+            } finally {
                 this.lock.unlockRead(stamp);
             }
+
+            return (T)var6;
+        } else {
+            return value;
         }
-        return value;
     }
-    
-    private T writeValue(final int ctx) {
-        final long stamp = this.lock.writeLock();
+
+    private T writeValue(int ctx) {
+        long stamp = this.lock.writeLock();
+
+        Object var4;
         try {
-            if (this.validate(this.value, ctx)) {
-                return this.value;
+            if (!this.validate(this.value, ctx)) {
+                return this.value = (T)this.factory.apply(ctx);
             }
-            return this.value = this.factory.apply(ctx);
-        }
-        finally {
+
+            var4 = this.value;
+        } finally {
             this.lock.unlockWrite(stamp);
         }
+
+        return (T)var4;
     }
-    
-    private boolean validate(final T value, final int ctx) {
+
+    private boolean validate(T value, int ctx) {
         return value != null && this.validator.validate(value, ctx);
     }
-    
-    public interface Validator<T>
-    {
-        boolean validate(final T p0, final int p1);
+
+    public interface Validator<T> {
+        boolean validate(T var1, int var2);
     }
 }

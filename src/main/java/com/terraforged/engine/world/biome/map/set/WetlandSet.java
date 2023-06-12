@@ -1,6 +1,6 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.world.biome.map.set;
 
@@ -10,24 +10,18 @@ import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.map.defaults.DefaultBiome;
 import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.util.Map;
 
-public class WetlandSet extends TemperatureSet
-{
+public class WetlandSet extends TemperatureSet {
     private final BiomeMap<?> fallback;
-    
-    public WetlandSet(final Map<TempCategory, IntList> map, final BiomeMap<?> fallback, final DefaultBiome defaultBiome, final BiomeContext<?> context) {
+
+    public WetlandSet(Map<TempCategory, IntList> map, BiomeMap<?> fallback, DefaultBiome defaultBiome, BiomeContext<?> context) {
         super(map, defaultBiome, context);
         this.fallback = fallback;
     }
-    
-    @Override
-    public int getBiome(final Cell cell) {
-        final int biome = super.getBiome(cell);
-        if (biome == Integer.MIN_VALUE) {
-            return this.fallback.getLand(cell);
-        }
-        return biome;
+
+    public int getBiome(Cell cell) {
+        int biome = super.getBiome(cell);
+        return biome == Integer.MIN_VALUE ? this.fallback.getLand(cell) : biome;
     }
 }
