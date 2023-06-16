@@ -1,1 +1,1 @@
-cd Fabric & gradlew clean build & exit
+cd Fabric & gradlew clean build & pause 

@@ -48,6 +48,7 @@ public interface ModClimates extends ModRegistry {
     static void register() {
         var registry = BuiltinRegistries.BIOME;
         var biomes = BiomeUtil.getOverworldBiomes(registry);
+        System.out.println("susser");
         for (var type : BiomeType.values()) {
             ModRegistries.register(CLIMATE, type.name().toLowerCase(Locale.ROOT), Factory.create(type, biomes, registry));
         }

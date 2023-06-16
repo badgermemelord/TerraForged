@@ -1,20 +1,21 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
+//
+// Source code recreated from a .class file by Quiltflower
+//
 
 package com.terraforged.engine.serialization.io;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.terrain.TerrainType;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class CellIO
-{
-    public static void readTo(final DataInput in, final Cell cell) throws IOException {
+public class CellIO {
+    public CellIO() {
+    }
+
+    public static void readTo(DataInput in, Cell cell) throws IOException {
         cell.value = in.readFloat();
         cell.erosion = in.readFloat();
         cell.sediment = in.readFloat();
@@ -35,8 +36,8 @@ public class CellIO
         cell.terrain = TerrainType.get(in.readInt());
         cell.biome = BiomeType.get(in.readInt());
     }
-    
-    public static void writeTo(final Cell cell, final DataOutput out) throws IOException {
+
+    public static void writeTo(Cell cell, DataOutput out) throws IOException {
         out.writeFloat(cell.value);
         out.writeFloat(cell.erosion);
         out.writeFloat(cell.sediment);
